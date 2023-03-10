@@ -19,7 +19,7 @@
 } */
 
 .activeContainer {
-  margin: 2vh 0;
+  /* margin: 2vh 0; */
   height: 5rem;
   width: 100%;
   display: flex;

@@ -101,6 +101,9 @@ const ChatUiWindow: FC<{
         22222,
         JSON.stringify(currentMessageObj?.messages)
       );
+      console.log('triggered useeffect function');
+      window && console.log('window present');
+
   }, [currentMessageObj?.messages?.length, window]);
 
   const handleSend = useCallback(
