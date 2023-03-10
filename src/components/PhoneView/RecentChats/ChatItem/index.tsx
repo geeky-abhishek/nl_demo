@@ -2,7 +2,7 @@ import React from "react";
 import { Box, useColorModeValue } from "@chakra-ui/react";
 import styles from "./index.module.css";
 import { useState } from "react";
-import Profile from "../../Profile";
+import Profile from '../../Profile';
 import Image from 'next/image'
 import profilePic from '../../../../assets/images/killua.jpg';
 

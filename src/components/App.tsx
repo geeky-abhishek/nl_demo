@@ -4,29 +4,11 @@ import {
   registerOnSessionCallback,
   send,
 } from './websocket';
-// import MessageWindow from "./MessageWindow";
-// import Profile from "./Profile";
-// import TextBar from "./TextBar";
-// import {
-//   useColorModeValue,
-//   Box,
-//   Flex,
-//   Text,
-//   Spacer,
-//   Image,
-//   interactivity,
-// } from "@chakra-ui/react";
 import { io, Socket } from 'socket.io-client';
 import { startWebsocketConnection } from './websocket';
-// import Notification from "./OTPpage/Notifications";
 import { useCookies, withCookies } from 'react-cookie';
 import { useRouter } from 'next/router';
-// import ColorModeSwitcher from "./ColorModeSwitcher";
-// import { SessionState } from "http2";
-// import { useCol } from "react-bootstrap/esm/Col";
 import PhoneView from './PhoneView/index';
-// import WebView from "./WebView";
-// import RecentChats from "./PhoneView/RecentChats";
 
 interface appProps {
   currentUser: { name: string; number: string | null };
