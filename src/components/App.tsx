@@ -25,6 +25,7 @@ import { useRouter } from 'next/router';
 // import { SessionState } from "http2";
 // import { useCol } from "react-bootstrap/esm/Col";
 import PhoneView from './PhoneView/index';
+import axios from 'axios';
 // import WebView from "./WebView";
 // import RecentChats from "./PhoneView/RecentChats";
 
@@ -98,6 +99,8 @@ const App: React.FC<appProps> = ({
     username: '',
     session: {},
   };
+
+  
 
   const [state, setState] = useState<{
     allMessages: {
@@ -553,6 +556,7 @@ console.log("cvb:",{state})
       currentUser={currentUser}
       addingNewUser={onAddingUser}
       toRemoveUser={toRemoveUser}
+      setState={setCurrentUserMessageObject}
       onSendLocation={sendLocation}
       toShowChats={{
         name: '',

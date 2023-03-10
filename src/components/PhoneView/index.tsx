@@ -49,6 +49,7 @@ const PhoneView: React.FC<phoneViewProps> = ({
   toRemoveUser,
   toShowChats,
   onSendLocation,
+  setState
 }) => {
   const [toggleView, setToggleView] = useState(true);
   const [starredView, setStarredView] = useState(false);
@@ -82,6 +83,7 @@ const PhoneView: React.FC<phoneViewProps> = ({
           messages={messages}
           username={username}
           selected={selected}
+          setState={setState}
           toSendMessage={sendMessageFunc}
           sendLocation={onSendLocation}
         />

@@ -39,6 +39,7 @@ const ChatWindow: React.FC<chatWindowProps> = ({
   currentUser,
   sendLocation,
   toShowChats,
+  setState
 }) => {
   const textColor = useColorModeValue("black", "white");
   const backgroundColorToggle = useColorModeValue(
@@ -55,9 +56,7 @@ const ChatWindow: React.FC<chatWindowProps> = ({
   );
   console.log("vvv:", { currentUser });
 
-  useEffect(() => {
-    toSendMessage(currentUser?.startingMessage,null,false)
-  }, []);
+  
   return (
     <Flex
       bgColor="var(--primarydarkblue)"
@@ -112,6 +111,8 @@ const ChatWindow: React.FC<chatWindowProps> = ({
               username={username}
               selected={selected}
               onSend={toSendMessage}
+              currentUser={currentUser}
+              setState={setState}
             />
           </Box>
         </Box>

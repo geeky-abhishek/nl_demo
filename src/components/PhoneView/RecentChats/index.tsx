@@ -133,7 +133,7 @@ const RecentChats: React.FC<recentChatsProps> = ({
   //   }
   //   onAddingNewUser(newName, newPhoneNumber);
   // };
-
+console.log("hjk:",{allUsers})
   return (
     <Flex
       flexDirection="column"
@@ -152,7 +152,7 @@ const RecentChats: React.FC<recentChatsProps> = ({
         <Box className={`${styles.backBox} ${backBoxToggle}`}>
           <button className={`${styles.starred}`} onClick={StarredViewHandler}>Starred Messages</button>
           <Box className={styles.chatList}>
-            {allUsers.map((user, index) => {
+            {(allUsers?? [])?.map((user, index) => {
               return (
                 <ChatItem
                   toRemoveUser={toRemoveUser}

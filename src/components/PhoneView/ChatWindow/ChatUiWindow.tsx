@@ -1,4 +1,5 @@
 // import '@chatui/core/es/styles/index.less';
+import { position } from "@chakra-ui/react";
 import Chat, {
   Bubble,
   useMessages,
@@ -11,8 +12,17 @@ import Chat, {
   ScrollView,
 } from "@chatui/core";
 import "@chatui/core/dist/index.css";
+import axios from "axios";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
+const normalizedChat = (chats: any) => {
+  return chats.map(chat=>({
+    text:chat?.payload?.text,
+    username:chat?.userId,
+    position:chats?.messageState==='REPLIED' ? 'left' : 'right'
+    //choices:
+  }))
+};
 interface messageProps {
   text: any;
   username: string;
@@ -32,13 +42,22 @@ const ChatUiWindow: FC<{
     phoneNumber: string | null;
     messages: any[];
   };
-  data?:any;
-  onSend: (arg:string) => any;
+  data?: any;
+  onSend: (arg: string) => any;
   messagesog: messageProps[];
   username: string;
   chatUiMsg: Array<any>;
   selected: (option: { key: string; text: string; backmenu: boolean }) => void;
-}> = ({ currentMessageObj, messagesog, username, selected, onSend ,data}) => {
+}> = ({
+  currentMessageObj,
+  messagesog,
+  username,
+  selected,
+  onSend,
+  data,
+  currentUser,
+  setState,
+}) => {
   console.log("vvv:", { messagesog, currentMessageObj });
   const [msg, setMsg] = useState([]);
   const { messages, appendMsg, setTyping, resetList } = useMessages(msg);
@@ -46,34 +65,59 @@ const ChatUiWindow: FC<{
   const chatUIMsg = useMemo(() => {
     return currentMessageObj?.messages?.map((msg) => ({
       type: msg?.choices ? "options" : "text",
-      content: { text: msg?.text, data: { ...msg } ,},
-      position:msg?.position ?? 'right'
+      content: { text: msg?.text, data: { ...msg } },
+      position: msg?.position ?? "right",
     }));
   }, [currentMessageObj]);
 
-  console.log("zzz:", { messages, chatUIMsg ,currentMessageObj});
+  console.log("mnop:", { messages, chatUIMsg, currentMessageObj });
+  console.log("mnop:", { currentMessageObj });
+// useEffect(()=>{
+//   onSend(currentUser?.startingMessage, null, false);
+// },[])
+  useEffect(() => {
+    const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=9999404725`;
+   // const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=103ceda6-8b92-4338-8615-230fe7e27472&userId=7597185708`;
+    axios
+      .get(url)
+      .then((res) => {
+        console.log("mnop res:", { res });
+        if (res?.data?.result?.records?.length > 0) {
+          const normalizedChats = normalizedChat(res.data.result.records);
+          console.log("mnop:", { normalizedChats });
+            setState((prev:any)=>({...prev,messages:normalizedChats}))
+        } else {
+          onSend(currentUser?.startingMessage, null, false);
+        }
+      })
+      .catch((err) => {
+        console.error("cvbn:", err);
+      });
+  }, []);
 
-useEffect(()=>{
- window && window.onChatCompleted?.(22222,JSON.stringify(currentMessageObj?.messages));
-},[currentMessageObj?.messages?.length,window]);
+  useEffect(() => {
+    window &&
+      window.onChatCompleted?.(
+        22222,
+        JSON.stringify(currentMessageObj?.messages)
+      );
+  }, [currentMessageObj?.messages?.length, window]);
 
   const handleSend = useCallback(
     (type: string, val: any) => {
-     
       if (type === "text" && val.trim()) {
-        console.log("zzz:",{type,val})
+        console.log("zzz:", { type, val });
         appendMsg({
           type: "text",
           content: { text: val },
           position: "right",
         });
-        onSend(val,null,true);
-       
+        onSend(val, null, true);
       }
     },
     [onSend]
   );
- 
+
   const renderMessageContent = useCallback(
     (msg: any) => {
       const { content, type } = msg;
@@ -91,18 +135,22 @@ useEffect(()=>{
         case "options":
           return (
             <div>
-             <Bubble content={content.text} />
-             <div style={{marginTop:'10px'}}/>
-            <ScrollView
-              data={content?.data?.choices}
-              // renderItem={(item:{key:string,text:string}) => <Button label={`${item.key} ${item.text}`} onClick={()=> selected({key:item.key,text:item.text,backmenu:false})}/>}
-              renderItem={(item:{key:string,text:string}) => <Button label={`${item.key} ${item.text}`} onClick={(e)=>{
-                e.preventDefault();
-               // selected({key: item.key, text: item.text, backmenu: false})
-               handleSend('text',item.key)
-              }}/>}
-            
-            />
+              <Bubble content={content.text} />
+              <div style={{ marginTop: "10px" }} />
+              <ScrollView
+                data={content?.data?.choices}
+                // renderItem={(item:{key:string,text:string}) => <Button label={`${item.key} ${item.text}`} onClick={()=> selected({key:item.key,text:item.text,backmenu:false})}/>}
+                renderItem={(item: { key: string; text: string }) => (
+                  <Button
+                    label={`${item.key} ${item.text}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // selected({key: item.key, text: item.text, backmenu: false})
+                      handleSend("text", item.key);
+                    }}
+                  />
+                )}
+              />
             </div>
           );
         default:
