@@ -114,9 +114,9 @@ const App: React.FC<appProps> = ({
     window.scrollTo(0, document.body.scrollHeight);
   };
 
-  useEffect(() => {
-    setState(initialState);
-  }, [currentUser]);
+  // useEffect(() => {
+  //   setState(initialState);
+  // }, [currentUser]);
 console.log("cvb:",{state})
   useEffect(() => {
     // if (cookies['access_token'] !== undefined) {
