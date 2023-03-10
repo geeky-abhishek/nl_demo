@@ -1,10 +1,10 @@
 .container {
-  margin: 2vh 0;
+  /* margin: 2vh 0; */
   height: 5rem;
-  width: 80%;
+  width: 100%;
   display: flex;
   align-items: center;
-  border-bottom: 2px var(--grey) dotted;
+  border-bottom: 2px var(--lightgrey) dotted;
   /* border-radius: 10px; */
   /* box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.3); */
   font-weight: 600;
@@ -21,10 +21,10 @@
 .activeContainer {
   margin: 2vh 0;
   height: 5rem;
-  width: 80%;
+  width: 100%;
   display: flex;
   align-items: center;
-  border-bottom: 2px var(--grey) dotted;
+  border-bottom: 2px var(--lightgrey) dotted;
   /* border-radius: 10px; */
   /* background-color: var(--blue); */
   font-weight: 600;
@@ -52,25 +52,13 @@
   flex-direction: column;
 }
 
-/* .lightFontColor {
-    color: white;
-} */
-
-/* .darkFontColor {
-    color: var(--secondarygreen);
-} */
-
-/* .activeFont {
-    color: white;
-} */
-
 .chatItem_userName {
   flex: 8;
   display: flex;
   align-items: flex-end;
   font-size: 1rem;
   font-family: 'Mulish', sans-serif;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .chatItem_phoneNumber {
@@ -92,17 +80,3 @@
 .chatItem_botNumber {
   flex: 0;
 }
-
-/* Toggle Theme Classes */
-
-/* .lightPhoneColor {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.darkPhoneColor {
-    color: rgba(0, 0, 0, 0.7);
-}
-
-.activephoneFont {
-    color: rgba(255, 255, 255, 0.7);
-} */
