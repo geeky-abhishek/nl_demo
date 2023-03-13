@@ -3,7 +3,6 @@ import ChatWindow from "./ChatWindow";
 import { useState } from "react";
 import RecentChats from "./RecentChats";
 import StarredChats from "./StarredChats";
-import ChatUiWindow from "./ChatWindow/ChatUiWindow";
 import NoSSR from "react-no-ssr";
 const Loading = () => <div>Loading...</div>;
 import dynamic from "next/dynamic";
@@ -29,8 +28,6 @@ interface phoneViewProps {
   allUsers: { name: string; number: string | null; active: boolean }[];
   toChangeCurrentUser: (name: string, number: string | null) => void;
   currentUser: { name: string; number: string | null };
-  addingNewUser: (newName: string, newNumber: string | null) => void;
-  toRemoveUser: (name: string, number: string | null) => void;
   toShowChats: { name: string; number: string | null };
   onSendLocation: (location: string) => void;
 }
@@ -45,8 +42,6 @@ const PhoneView: React.FC<phoneViewProps> = ({
   allUsers,
   toChangeCurrentUser,
   currentUser,
-  addingNewUser,
-  toRemoveUser,
   toShowChats,
   onSendLocation,
   setState
@@ -91,10 +86,8 @@ const PhoneView: React.FC<phoneViewProps> = ({
     } else {
       return (
         <RecentChats
-          onAddingNewUser={addingNewUser}
           toChangeCurrentUser={toChangeCurrentUser}
           allUsers={allUsers}
-          toRemoveUser={toRemoveUser}
           toShowChatWindow={showChatWindow}
           toShowStarredView={showStarredSection}
         />
@@ -103,10 +96,8 @@ const PhoneView: React.FC<phoneViewProps> = ({
   }else{
     return (
       <StarredChats
-        onAddingNewUser={addingNewUser}
         toChangeCurrentUser={toChangeCurrentUser}
         allUsers={allUsers}
-        toRemoveUser={toRemoveUser}
         tohideStarredSection={hideStarredSection}
       />
     );

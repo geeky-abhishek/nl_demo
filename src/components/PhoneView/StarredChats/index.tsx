@@ -1,33 +1,23 @@
 import React from "react";
-import { useState } from "react";
 import styles from "./index.module.css";
 import { Box, Flex, useColorModeValue, Button } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
-import ChatItem from "../RecentChats/ChatItem";
 
 interface recentChatsProps {
   allUsers: { name: string; number: string | null; active: boolean }[];
   toChangeCurrentUser: (name: string, number: string | null) => void;
-  onAddingNewUser: (newName: string, newNumber: string) => void;
-  toRemoveUser: (name: string, number: string | null) => void;
   tohideStarredSection: () => void
 }
 
 const StarredChats: React.FC<recentChatsProps> = ({
   allUsers,
   toChangeCurrentUser,
-  onAddingNewUser,
-  toRemoveUser,
   tohideStarredSection
 }) => {
   const backgroundColorToggle = useColorModeValue(
     styles.lightContainer,
     styles.darkContainer
-  );
-  const fontColorToggle = useColorModeValue(
-    styles.lightColor,
-    styles.darkColor
   );
 
   const backBoxToggle = useColorModeValue(
@@ -40,7 +30,6 @@ const StarredChats: React.FC<recentChatsProps> = ({
     number: string | null
   ) => {
     toChangeCurrentUser(name, number);
-    tohideStarredSection();
   };
 
   return (

@@ -2,7 +2,6 @@ import React from "react";
 import { Box, useColorModeValue } from "@chakra-ui/react";
 import styles from "./index.module.css";
 import { useState } from "react";
-import Profile from '../../Profile';
 import Image from 'next/image'
 import profilePic from '../../../../assets/images/killua.jpg';
 
@@ -11,7 +10,6 @@ interface chatItemProps {
   name: string;
   phoneNumber: string | null;
   toChangeCurrentUser: (name: string, number: string | null) => void;
-  toRemoveUser: (name: string, number: string | null) => void;
 }
 
 const ChatItem: React.FC<chatItemProps> = ({
@@ -19,7 +17,6 @@ const ChatItem: React.FC<chatItemProps> = ({
   name,
   phoneNumber,
   toChangeCurrentUser,
-  toRemoveUser,
 }) => {
   const backgroundColorToggle = useColorModeValue(
     styles.lightContainer,
@@ -61,8 +58,6 @@ const ChatItem: React.FC<chatItemProps> = ({
         className={`${backgroundColorToggle} ${active ? styles.activeContainer : styles.container
           }`}
       >
-        {/* <Box onClick={showProfileModal} className={styles.avatar}></Box> */}
-        {/* <Box className={styles.avatar}></Box> */}
         <div className={styles.avatar}>
           <Image src={profilePic} height={'100%'} width={'100%'}/>
         </div>
@@ -85,13 +80,6 @@ const ChatItem: React.FC<chatItemProps> = ({
           </Box>
         </Box>
       </button>
-      <Profile
-        show={toShowProfile}
-        toHide={hideProfileModal}
-        name={name}
-        number={phoneNumber}
-        toRemoveProfile={toRemoveUser}
-      />
     </React.Fragment>
   );
 };

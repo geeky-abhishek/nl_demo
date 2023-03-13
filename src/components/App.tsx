@@ -10,16 +10,12 @@ import { useCookies, withCookies } from 'react-cookie';
 import { useRouter } from 'next/router';
 import PhoneView from './PhoneView/index';
 import axios from 'axios';
-// import WebView from "./WebView";
 // import RecentChats from "./PhoneView/RecentChats";
 
 interface appProps {
   currentUser: { name: string; number: string | null };
   allUsers: { name: string; number: string | null; active: boolean }[];
-  userName: string;
   toChangeCurrentUser: (name: string, number: string | null) => void;
-  toAddUser: (newName: string, newNumber: string | null) => void;
-  toRemoveUser: (name: string, number: string | null) => void;
   // toShowChats: (name: string, number: string | null) => void;
 }
 
@@ -45,12 +41,9 @@ type humanMessage = {
 };
 
 const App: React.FC<appProps> = ({
-  toRemoveUser,
   currentUser,
   allUsers,
-  userName,
   toChangeCurrentUser,
-  toAddUser,
 }) => {
   // Router for Navigation
   const router = useRouter();
@@ -60,7 +53,6 @@ const App: React.FC<appProps> = ({
   // const [recieved, setrecieved] = useState(false);
   const [cookies, setCookies] = useCookies();
   const [socket, setSocket] = useState<Socket>();
-  const [profileName, setProfileName] = useState(userName);
 
   const [currentUserMessageObject, setCurrentUserMessageObject] = useState<{
     user: string;
@@ -155,10 +147,11 @@ console.log("cvb:",{state})
   useEffect(() => {
     setSocket(
       io(`${process.env.NEXT_PUBLIC_TRANSPORT_SOCKET_URL}`, {
-        // query: { deviceId: `phone:${localStorage.getItem('phoneNumber')}` },
         query: {
-          deviceId: `phone:9999404725`,
-          token: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjRwSFNCOUYteGw5OGZLSnJ0LVEyVDV6UjQ3cyJ9.eyJhdWQiOiIzMjBiMDIwYS0zZDg0LTRkOGEtYTE5MS1kYTRlOTcyYzI5NTEiLCJleHAiOjE2OTM0MTA4NTYsImlhdCI6MTY2MTg3NDg1NiwiaXNzIjoiYWNtZS5jb20iLCJzdWIiOiJhYzEyYzliMy05OWVkLTQzOTYtYjFlZC01NDRmMzY4NjIzYjkiLCJqdGkiOiI3NmNmMGNlMi0wYTUxLTQzM2EtYWFmOC1lMGMyNzUwOTg2MmIiLCJhdXRoZW50aWNhdGlvblR5cGUiOiJQQVNTV09SRCIsInByZWZlcnJlZF91c2VybmFtZSI6Im5sYXBwQHNhbWFncmEiLCJhcHBsaWNhdGlvbklkIjoiMzIwYjAyMGEtM2Q4NC00ZDhhLWExOTEtZGE0ZTk3MmMyOTUxIiwicm9sZXMiOlsiT3BlblJvbGUiXSwic2lkIjoiMzQ4YWU5ODgtMWFmMS00YTE2LWFmNzgtNmJkZjNlNWZkYTUwIiwiYXV0aF90aW1lIjoxNjYxODc0ODU2LCJ0aWQiOiIwMTA1NjZmZC1lMWNiLWM2NTgtYjY1OS1hMWQzZTA3MGJhYTgiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiT3BlblJvbGUiLCJESUVUIiwibWFuYXZfc2FtcGFkYSJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJPcGVuUm9sZSIsIlgtSGFzdXJhLVVzZXItSWQiOiJubGFwcEBzYW1hZ3JhMTIzIn19.KNypTTPaqLQKDzSGq6-8scr6WaQm_f7KGLhQ0pqorYQ8xeiqQPUKtkXBxVU0XpVzJLQkj6bMmv2QF5WyMf2-9KTqYQXtFL6HJ1Nt9GsHtqil4hqfVGK4efUH5dQeLo_PuS_pg0FXdkFT65vPlaFE0jzzjDiWbVlt0lkbdrbov_lIqkbORBnyehDMMKK5d4fmBBIrF1O_9RQFGJt8XB8TKoTCTN0Y4mVqEQ1vVAqH0NoVamja35g-pLj_PW0-T2phufnAbRe8J6IwMnabnlyuj07wbA6ffaarrCDN7aMq9aBHRYn0vqSm3k9aELBGYoeAa_zoXDbIDzlH8mgjQpkmGw`,
+          deviceId: `phone:${localStorage.getItem('mobile')}`,
+          token: `${localStorage.getItem('auth')}`,
+          // deviceId: `phone:9999404725`,
+          // token: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjRwSFNCOUYteGw5OGZLSnJ0LVEyVDV6UjQ3cyJ9.eyJhdWQiOiIzMjBiMDIwYS0zZDg0LTRkOGEtYTE5MS1kYTRlOTcyYzI5NTEiLCJleHAiOjE2OTM0MTA4NTYsImlhdCI6MTY2MTg3NDg1NiwiaXNzIjoiYWNtZS5jb20iLCJzdWIiOiJhYzEyYzliMy05OWVkLTQzOTYtYjFlZC01NDRmMzY4NjIzYjkiLCJqdGkiOiI3NmNmMGNlMi0wYTUxLTQzM2EtYWFmOC1lMGMyNzUwOTg2MmIiLCJhdXRoZW50aWNhdGlvblR5cGUiOiJQQVNTV09SRCIsInByZWZlcnJlZF91c2VybmFtZSI6Im5sYXBwQHNhbWFncmEiLCJhcHBsaWNhdGlvbklkIjoiMzIwYjAyMGEtM2Q4NC00ZDhhLWExOTEtZGE0ZTk3MmMyOTUxIiwicm9sZXMiOlsiT3BlblJvbGUiXSwic2lkIjoiMzQ4YWU5ODgtMWFmMS00YTE2LWFmNzgtNmJkZjNlNWZkYTUwIiwiYXV0aF90aW1lIjoxNjYxODc0ODU2LCJ0aWQiOiIwMTA1NjZmZC1lMWNiLWM2NTgtYjY1OS1hMWQzZTA3MGJhYTgiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiT3BlblJvbGUiLCJESUVUIiwibWFuYXZfc2FtcGFkYSJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJPcGVuUm9sZSIsIlgtSGFzdXJhLVVzZXItSWQiOiJubGFwcEBzYW1hZ3JhMTIzIn19.KNypTTPaqLQKDzSGq6-8scr6WaQm_f7KGLhQ0pqorYQ8xeiqQPUKtkXBxVU0XpVzJLQkj6bMmv2QF5WyMf2-9KTqYQXtFL6HJ1Nt9GsHtqil4hqfVGK4efUH5dQeLo_PuS_pg0FXdkFT65vPlaFE0jzzjDiWbVlt0lkbdrbov_lIqkbORBnyehDMMKK5d4fmBBIrF1O_9RQFGJt8XB8TKoTCTN0Y4mVqEQ1vVAqH0NoVamja35g-pLj_PW0-T2phufnAbRe8J6IwMnabnlyuj07wbA6ffaarrCDN7aMq9aBHRYn0vqSm3k9aELBGYoeAa_zoXDbIDzlH8mgjQpkmGw`,
         },
       })
     );
@@ -305,19 +298,6 @@ console.log("cvb:",{state})
     //     }),
     //   });
     // }
-  };
-
-  const onAddingUser = (name: string, phoneNumber: string | null) => {
-    const newMessageObject = {
-      user: name,
-      phoneNumber: phoneNumber,
-      messages: [],
-    };
-    setState({
-      ...state,
-      allMessages: state.allMessages.concat(newMessageObject),
-    });
-    toAddUser(name, phoneNumber);
   };
 
   const onChangingCurrentUser = (name: string, phoneNumber: string | null) => {
@@ -538,8 +518,6 @@ console.log("cvb:",{state})
       allUsers={allUsers}
       toChangeCurrentUser={onChangingCurrentUser}
       currentUser={currentUser}
-      addingNewUser={onAddingUser}
-      toRemoveUser={toRemoveUser}
       setState={setCurrentUserMessageObject}
       onSendLocation={sendLocation}
       toShowChats={{
@@ -561,8 +539,6 @@ console.log("cvb:",{state})
   //       allUsers={allUsers}
   //       toChangeCurrentUser={onChangingCurrentUser}
   //       currentUser={currentUser}
-  //       addingNewUser={onAddingUser}
-  //       toRemoveUser={toRemoveUser}
   //       onSendLocation={sendLocation}
   //     />
   //   );

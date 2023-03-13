@@ -23,6 +23,7 @@ const normalizedChat = (chats: any) => {
     //choices:
   }))
 };
+
 interface messageProps {
   text: any;
   username: string;
@@ -76,7 +77,9 @@ const ChatUiWindow: FC<{
 //   onSend(currentUser?.startingMessage, null, false);
 // },[])
   useEffect(() => {
-    const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=9999404725`;
+    let phone = localStorage.getItem('mobile');
+    if(phone === '') alert('Number required');
+    const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${phone}`;
    // const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=103ceda6-8b92-4338-8615-230fe7e27472&userId=7597185708`;
     axios
       .get(url)
@@ -97,14 +100,14 @@ const ChatUiWindow: FC<{
 
   useEffect(() => {
     window &&
-      window.onChatCompleted?.(
-        22222,
+      window.androidInteract.onChatCompleted?.(
+        String(currentUser?.id),
         JSON.stringify(currentMessageObj?.messages)
       );
       console.log('triggered useeffect function');
       window && console.log('window present');
 
-  }, [currentMessageObj?.messages?.length, window]);
+  }, [currentMessageObj?.messages?.length]);
 
   const handleSend = useCallback(
     (type: string, val: any) => {

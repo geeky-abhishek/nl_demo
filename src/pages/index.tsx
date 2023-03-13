@@ -1,26 +1,18 @@
-import type { NextPage } from "next";
-import { useState, useEffect } from "react";
-import Head from "next/head";
-import Image from "next/image";
-import App from "../components/App";
-import Settings from "../components/Settings";
-import ChatSection from "../components/ChatSection";
-import React from "react";
-import axios from "axios";
-import PhoneView from "../components/PhoneView";
-// import SideBar from "../components/SideBar/Index";
+import type { NextPage } from 'next';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Image from 'next/image';
+import App from '../components/App';
+import React from 'react';
+import axios from 'axios';
+import PhoneView from '../components/PhoneView';
 // import * as serviceWorker from "../utils/serviceWorker";
-import { CookiesProvider } from "react-cookie";
+import { CookiesProvider } from 'react-cookie';
 // import { ColorModeScript, Flex, Box } from "@chakra-ui/react";
-import NoSSR from "react-no-ssr";
+import NoSSR from 'react-no-ssr';
 const Loading = () => <div>Loading...</div>;
 
 const Home: NextPage = () => {
-  // User Settingss
-  const [profileName, setProfileName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [userBio, setUserBio] = useState("");
-
   // All Users
   const [users, setUsers] = useState<
     { name: string; number: string | null; active: boolean }[]
@@ -51,100 +43,51 @@ const Home: NextPage = () => {
   //     console.error(e.response.data);
   //   }
   // }, []);
-  const [toggleSettings, setToggleSettings] = useState(0);
 
-console.log('vbnm:')
-  
+  console.log('vbnm:');
+
   useEffect(() => {
-    
     //@ts-ignore
-    const urls = (localStorage.getItem('botList') ? JSON.parse(localStorage.getItem('botList')) :[
-      "d0dad28e-8b84-4bc9-92ab-f22f90c2432a",
-      "d655cf03-1f6f-4510-acf6-d3f51b488a5e",
-      "d3ed4174-3c55-4c60-b11b-facbad31a5aa",
-      "487e1d4f-a781-468e-b2ec-c83c3f2b2dee",
-    ]).map(
+    const urls = (
+      localStorage.getItem('botList')
+        ? JSON.parse(localStorage.getItem('botList'))
+        : [
+            'd0dad28e-8b84-4bc9-92ab-f22f90c2432a',
+            'd655cf03-1f6f-4510-acf6-d3f51b488a5e',
+            'd3ed4174-3c55-4c60-b11b-facbad31a5aa',
+            '487e1d4f-a781-468e-b2ec-c83c3f2b2dee',
+          ]
+    ).map(
       (botId: string) =>
         `${process.env.NEXT_PUBLIC_UCI_BASE_URL}/admin/v1/bot/get/${botId}`
     );
-    console.log("hjkl:",{urls})
+    console.log('hjkl:', { urls });
     const config = {
       headers: {
-        "Content-Type": "application/json",
-        ownerID: "95e4942d-cbe8-477d-aebd-ad8e6de4bfc8",
-        ownerOrgID: "ORG_001",
+        'Content-Type': 'application/json',
+        ownerID: '95e4942d-cbe8-477d-aebd-ad8e6de4bfc8',
+        ownerOrgID: 'ORG_001',
       },
     };
     const requests = urls.map((url) => axios.get(url, config));
-    axios.all(requests).then((responses) => {
-      console.log("hjkl:", { responses });
-      const usersList=responses?.map(res=>res?.data?.result?.data);
-      console.log('hjk user:',{usersList})
-      setUsers(usersList);
-      setCurrentUser(usersList?.[0]);
-    }).catch(err=>{console.log("hjkl:",{err})});
+    axios
+      .all(requests)
+      .then((responses) => {
+        console.log('hjkl:', { responses });
+        const usersList = responses?.map((res) => res?.data?.result?.data);
+        console.log('hjk user:', { usersList });
+        setUsers(usersList);
+        setCurrentUser(usersList?.[0]);
+      })
+      .catch((err) => {
+        console.log('hjkl:', { err });
+      });
   }, []);
-
-  useEffect(() => {
-    setProfileName(localStorage.getItem("profileName") || "");
-    setPhoneNumber(localStorage.getItem("phoneNumber") || "");
-    setUserBio(localStorage.getItem("userBio") || "");
-    // if (localStorage.getItem("botList") || "" !== "") {
-    //   setUsers(JSON.parse(localStorage.getItem("botList") || ""));
-    //   JSON.parse(localStorage.getItem("botList") || "").forEach(
-    //     (user: { name: string; number: string | null; active: boolean }) => {
-    //       if (user.active === true) {
-    //         setCurrentUser({
-    //           name: user.name,
-    //           number: user.number,
-    //         });
-    //       }
-    //     }
-    //   );
-    // }
-    // setCurrentUser({
-    //   name: "uci",
-    //   number: "7668717742",
-    // });
-  }, []);
-
-  const showSettings: React.MouseEventHandler = (event: React.MouseEvent) => {
-    setToggleSettings(1);
-  };
-
-  const showChatSection: React.MouseEventHandler = (
-    event: React.MouseEvent
-  ) => {
-    setToggleSettings(0);
-  };
-
-  const onChangeProfileName = (newName: string) => {
-    setProfileName(newName);
-    localStorage.setItem("profileName", newName);
-  };
-
-  const onChangePhoneNumber = (newPhoneNumber: string) => {
-    setPhoneNumber(newPhoneNumber);
-    localStorage.setItem("phoneNumber", newPhoneNumber);
-  };
-
-  const onChangeUserBio = (newBio: string) => {
-    setUserBio(newBio);
-    localStorage.setItem("userBio", newBio);
-  };
-
-  const onRemoveUser = (name: string, number: string | null) => {
-    const newUsers = users.filter((user) => {
-      return user.name !== name && user.number !== number;
-    });
-    setUsers(newUsers);
-    localStorage.setItem("AllUsers", JSON.stringify(newUsers));
-  };
 
   const onChangeCurrentUser = (name: string, number: string | null) => {
     const myUser = users.find((user) => {
       return user.name === name;
-    }) || { name: "Farmer Bot", number: null };
+    }) || { name: 'Farmer Bot', number: null };
     users.forEach((user, index) => {
       if (user.name === name && user.number === number) {
         user.active = true;
@@ -155,33 +98,41 @@ console.log('vbnm:')
     setCurrentUser(myUser);
   };
 
-  const onAddUser = (newName: string, newNumber: string | null) => {
-    if (users.length === 0) {
-      localStorage.setItem(
-        "AllUsers",
-        JSON.stringify([{ name: newName, number: newNumber, active: true }])
-      );
-      setUsers([{ name: newName, number: newNumber, active: true }]);
-      return;
-    }
-    setUsers(
-      (
-        prevUsers: { name: string; number: string | null; active: boolean }[]
-      ) => {
-        localStorage.setItem(
-          "AllUsers",
-          JSON.stringify([
-            ...prevUsers,
-            { name: newName, number: newNumber, active: false },
-          ])
-        );
-        return [
-          ...prevUsers,
-          { name: newName, number: newNumber, active: false },
-        ];
-      }
-    );
-  };
+  // const onRemoveUser = (name: string, number: string | null) => {
+  //   const newUsers = users.filter((user) => {
+  //     return user.name !== name && user.number !== number;
+  //   });
+  //   setUsers(newUsers);
+  //   localStorage.setItem("AllUsers", JSON.stringify(newUsers));
+  // };
+
+  // const onAddUser = (newName: string, newNumber: string | null) => {
+  //   if (users.length === 0) {
+  //     localStorage.setItem(
+  //       "AllUsers",
+  //       JSON.stringify([{ name: newName, number: newNumber, active: true }])
+  //     );
+  //     setUsers([{ name: newName, number: newNumber, active: true }]);
+  //     return;
+  //   }
+  //   setUsers(
+  //     (
+  //       prevUsers: { name: string; number: string | null; active: boolean }[]
+  //     ) => {
+  //       localStorage.setItem(
+  //         "AllUsers",
+  //         JSON.stringify([
+  //           ...prevUsers,
+  //           { name: newName, number: newNumber, active: false },
+  //         ])
+  //       );
+  //       return [
+  //         ...prevUsers,
+  //         { name: newName, number: newNumber, active: false },
+  //       ];
+  //     }
+  //   );
+  // };
 
   // New Code
 
@@ -191,14 +142,10 @@ console.log('vbnm:')
         onSSR={
           <App
             currentUser={currentUser}
-            userName={profileName}
             allUsers={users}
             toChangeCurrentUser={onChangeCurrentUser}
-            toAddUser={onAddUser}
-            toRemoveUser={onRemoveUser}
           />
-        }
-      >
+        }>
         <>
           {/*  <React.StrictMode> */}
           <Head>
@@ -214,49 +161,9 @@ console.log('vbnm:')
           <CookiesProvider>
             <App
               currentUser={currentUser}
-              userName={profileName}
               allUsers={users}
               toChangeCurrentUser={onChangeCurrentUser}
-              toAddUser={onAddUser}
-              toRemoveUser={onRemoveUser}
             />
-
-            {/* <Flex>
-          <Box className="SideBar" flex="1" max-width="25%" position="relative">
-            <Flex
-              width="25%"
-              max-height="100vh"
-              overflow-y="auto"
-              position="fixed"
-            >
-              {" "}
-              {toggleSettings === 0 ? (
-                <ChatSection
-                  toShowSettings={showSettings}
-                  allUsers={users}
-                  toChangeCurrentUser={onChangeCurrentUser}
-                  toRemoveUser={onRemoveUser}
-                />
-              ) : (
-                <Settings
-                  userName={profileName}
-                  userBio={userBio}
-                  toChangePhoneNumber={onChangePhoneNumber}
-                  toChangeProfileName={onChangeProfileName}
-                  toChangeUserBio={onChangeUserBio}
-                  toShowChatSection={showChatSection}
-                  toAddUser={onAddUser}
-                />
-              )}
-            </Flex>
-          </Box>
-
-          <App
-            currentUser={currentUser}
-            userName={profileName}
-            allUsers={users}
-          />  
-        </Flex> */}
 
             {/* <ColorModeScript /> */}
           </CookiesProvider>

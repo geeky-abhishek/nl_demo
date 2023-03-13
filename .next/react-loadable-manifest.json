@@ -1,12 +1,12 @@
 {
-  "../components/PhoneView/ChatWindow/index.tsx -> ./ChatUiWindow": {
-    "id": "../components/PhoneView/ChatWindow/index.tsx -> ./ChatUiWindow",
+  "..\\components\\PhoneView\\ChatWindow\\index.tsx -> ./ChatUiWindow": {
+    "id": "..\\components\\PhoneView\\ChatWindow\\index.tsx -> ./ChatUiWindow",
     "files": [
       "static/chunks/src_components_PhoneView_ChatWindow_ChatUiWindow_tsx.js"
     ]
   },
-  "../components/PhoneView/index.tsx -> ./ChatWindow/ChatUiWindow": {
-    "id": "../components/PhoneView/index.tsx -> ./ChatWindow/ChatUiWindow",
+  "..\\components\\PhoneView\\index.tsx -> ./ChatWindow/ChatUiWindow": {
+    "id": "..\\components\\PhoneView\\index.tsx -> ./ChatWindow/ChatUiWindow",
     "files": [
       "static/chunks/src_components_PhoneView_ChatWindow_ChatUiWindow_tsx.js"
     ]
