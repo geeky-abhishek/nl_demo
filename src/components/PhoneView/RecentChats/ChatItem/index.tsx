@@ -70,14 +70,14 @@ const ChatItem: React.FC<chatItemProps> = ({
           >
             {name}
           </Box>
-          <Box
+          {/* <Box
             className={`${phoneNumber === null
               ? styles.chatItem_botNumber
               : styles.chatItem_phoneNumber
               } ${active ? styles.activephoneFont : phoneColorToggle}`}
           >
             {phoneNumber}
-          </Box>
+          </Box> */}
         </Box>
       </button>
     </React.Fragment>

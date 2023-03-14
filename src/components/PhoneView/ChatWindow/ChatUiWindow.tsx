@@ -100,7 +100,8 @@ const ChatUiWindow: FC<{
 
   useEffect(() => {
     window &&
-      window.androidInteract.onChatCompleted?.(
+      // window.androidInteract.onChatCompleted?.(
+      window.onChatCompleted?.(
         String(currentUser?.id),
         JSON.stringify(currentMessageObj?.messages)
       );

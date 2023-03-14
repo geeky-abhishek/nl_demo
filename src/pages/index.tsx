@@ -48,9 +48,11 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     //@ts-ignore
+    const list =
+      localStorage.getItem('botList') || localStorage.getItem('chatList');
     const urls = (
-      localStorage.getItem('botList')
-        ? JSON.parse(localStorage.getItem('botList'))
+      list
+        ? JSON.parse(list)
         : [
             'd0dad28e-8b84-4bc9-92ab-f22f90c2432a',
             'd655cf03-1f6f-4510-acf6-d3f51b488a5e',
