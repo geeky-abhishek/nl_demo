@@ -81,6 +81,8 @@ const Home: NextPage = () => {
         const usersList = responses?.map((res) => res?.data?.result?.data);
         console.log("zxcv user:", { usersList });
         setUsers(usersList);
+        console.log('onBotDetailsLoaded running now.')
+        window?.androidInteract?.onBotDetailsLoaded(JSON.stringify(usersList));
         setCurrentUser(usersList?.[0]);
       })
       .catch((err) => {
