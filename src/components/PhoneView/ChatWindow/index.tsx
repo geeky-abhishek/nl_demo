@@ -39,6 +39,7 @@ const ChatWindow: React.FC<chatWindowProps> = ({
   currentUser,
   sendLocation,
   toShowChats,
+  socket,
   setState
 }) => {
   const textColor = useColorModeValue("black", "white");
@@ -113,6 +114,7 @@ const ChatWindow: React.FC<chatWindowProps> = ({
               onSend={toSendMessage}
               currentUser={currentUser}
               setState={setState}
+              socket={socket}
             />
           </Box>
         </Box>

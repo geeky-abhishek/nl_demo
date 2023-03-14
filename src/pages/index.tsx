@@ -1,15 +1,15 @@
-import type { NextPage } from 'next';
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import App from '../components/App';
-import React from 'react';
-import axios from 'axios';
-import PhoneView from '../components/PhoneView';
+import type { NextPage } from "next";
+import { useState, useEffect } from "react";
+import Head from "next/head";
+import Image from "next/image";
+import App from "../components/App";
+import React from "react";
+import axios from "axios";
+import PhoneView from "../components/PhoneView";
 // import * as serviceWorker from "../utils/serviceWorker";
-import { CookiesProvider } from 'react-cookie';
+import { CookiesProvider } from "react-cookie";
 // import { ColorModeScript, Flex, Box } from "@chakra-ui/react";
-import NoSSR from 'react-no-ssr';
+import NoSSR from "react-no-ssr";
 const Loading = () => <div>Loading...</div>;
 
 const Home: NextPage = () => {
@@ -44,12 +44,12 @@ const Home: NextPage = () => {
   //   }
   // }, []);
 
-  console.log('vbnm:');
+  console.log("vbnm:");
 
   useEffect(() => {
     //@ts-ignore
     const list =
-      localStorage.getItem('botList') || localStorage.getItem('chatList');
+      localStorage.getItem("botList") || localStorage.getItem("chatList");
     const urls = (
       list
         ? JSON.parse(list)
@@ -59,37 +59,39 @@ const Home: NextPage = () => {
             'd3ed4174-3c55-4c60-b11b-facbad31a5aa',
             '487e1d4f-a781-468e-b2ec-c83c3f2b2dee',
           ]
-    ).map(
+    )
+    //const urls = (list ? JSON.parse(list) : [])
+    .map(
       (botId: string) =>
         `${process.env.NEXT_PUBLIC_UCI_BASE_URL}/admin/v1/bot/get/${botId}`
     );
-    console.log('hjkl:', { urls });
+
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        ownerID: '95e4942d-cbe8-477d-aebd-ad8e6de4bfc8',
-        ownerOrgID: 'ORG_001',
+        "Content-Type": "application/json",
+        ownerID: "95e4942d-cbe8-477d-aebd-ad8e6de4bfc8",
+        ownerOrgID: "ORG_001",
       },
     };
     const requests = urls.map((url) => axios.get(url, config));
     axios
       .all(requests)
       .then((responses) => {
-        console.log('hjkl:', { responses });
+        console.log("hjkl:", { responses });
         const usersList = responses?.map((res) => res?.data?.result?.data);
-        console.log('hjk user:', { usersList });
+        console.log("zxcv user:", { usersList });
         setUsers(usersList);
         setCurrentUser(usersList?.[0]);
       })
       .catch((err) => {
-        console.log('hjkl:', { err });
+        console.log("hjkl:", { err });
       });
   }, []);
 
   const onChangeCurrentUser = (name: string, number: string | null) => {
     const myUser = users.find((user) => {
       return user.name === name;
-    }) || { name: 'Farmer Bot', number: null };
+    }) || { name: "Farmer Bot", number: null };
     users.forEach((user, index) => {
       if (user.name === name && user.number === number) {
         user.active = true;
@@ -147,7 +149,8 @@ const Home: NextPage = () => {
             allUsers={users}
             toChangeCurrentUser={onChangeCurrentUser}
           />
-        }>
+        }
+      >
         <>
           {/*  <React.StrictMode> */}
           <Head>

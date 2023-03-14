@@ -7,12 +7,15 @@ import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 interface recentChatsProps {
   allUsers: { name: string; number: string | null; active: boolean }[];
   toChangeCurrentUser: (name: string, number: string | null) => void;
-  tohideStarredSection: () => void
+  tohideStarredSection: () => void;
+  chats:Array<any>;
+  setStarredChats:(arg:Array<any>)=>any,
 }
 
 const StarredChats: React.FC<recentChatsProps> = ({
   allUsers,
   toChangeCurrentUser,
+  chats,setStarredChats,
   tohideStarredSection
 }) => {
   const backgroundColorToggle = useColorModeValue(

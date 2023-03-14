@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ChatWindow from "./ChatWindow";
 import { useState } from "react";
 import RecentChats from "./RecentChats";
@@ -44,11 +44,19 @@ const PhoneView: React.FC<phoneViewProps> = ({
   currentUser,
   toShowChats,
   onSendLocation,
-  setState
+  setState,socket
 }) => {
   const [toggleView, setToggleView] = useState(true);
   const [starredView, setStarredView] = useState(false);
+  const [starredChats, setStarredChats] = useState([]);
 
+  useEffect(()=>{
+    if(localStorage.getItem('starredChats')){
+      //@ts-ignore
+      setStarredChats(localStorage.getItem('starredChats'));
+    }
+  },[]);
+  
   const showChatSection: React.MouseEventHandler = (
     event: React.MouseEvent
   ) => {
@@ -81,6 +89,7 @@ const PhoneView: React.FC<phoneViewProps> = ({
           setState={setState}
           toSendMessage={sendMessageFunc}
           sendLocation={onSendLocation}
+          socket={socket}
         />
       );
     } else {
@@ -90,6 +99,7 @@ const PhoneView: React.FC<phoneViewProps> = ({
           allUsers={allUsers}
           toShowChatWindow={showChatWindow}
           toShowStarredView={showStarredSection}
+          socket={socket}
         />
       );
     }
@@ -99,6 +109,8 @@ const PhoneView: React.FC<phoneViewProps> = ({
         toChangeCurrentUser={toChangeCurrentUser}
         allUsers={allUsers}
         tohideStarredSection={hideStarredSection}
+        chats={starredChats}
+        setStarredChats={setStarredChats}
       />
     );
   }

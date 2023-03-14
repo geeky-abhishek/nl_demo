@@ -10,18 +10,22 @@ import Chat, {
   CardActions,
   Button,
   ScrollView,
+  Popup,
 } from "@chatui/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 import "@chatui/core/dist/index.css";
 import axios from "axios";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 
+
 const normalizedChat = (chats: any) => {
-  return chats.map(chat=>({
-    text:chat?.payload?.text,
-    username:chat?.userId,
-    position:chats?.messageState==='REPLIED' ? 'left' : 'right'
+  return chats.map((chat) => ({
+    text: chat?.payload?.text,
+    username: chat?.userId,
+    position: chats?.messageState === "REPLIED" ? "left" : "right",
     //choices:
-  }))
+  }));
 };
 
 interface messageProps {
@@ -58,9 +62,11 @@ const ChatUiWindow: FC<{
   data,
   currentUser,
   setState,
+  socket,
 }) => {
   console.log("vvv:", { messagesog, currentMessageObj });
   const [msg, setMsg] = useState([]);
+  const [open, setOpen] = useState(false);
   const { messages, appendMsg, setTyping, resetList } = useMessages(msg);
 
   const chatUIMsg = useMemo(() => {
@@ -71,67 +77,99 @@ const ChatUiWindow: FC<{
     }));
   }, [currentMessageObj]);
 
-  console.log("mnop:", { messages, chatUIMsg, currentMessageObj });
-  console.log("mnop:", { currentMessageObj });
-// useEffect(()=>{
-//   onSend(currentUser?.startingMessage, null, false);
-// },[])
+  console.log("ghjk:", { messages, chatUIMsg, currentMessageObj });
+  
+  // useEffect(()=>{
+  //   onSend(currentUser?.startingMessage, null, false);
+  // },[])
+
   useEffect(() => {
-    let phone = localStorage.getItem('mobile');
-    if(phone === '') alert('Number required');
-    const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${phone}`;
-   // const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=103ceda6-8b92-4338-8615-230fe7e27472&userId=7597185708`;
-    axios
-      .get(url)
-      .then((res) => {
-        console.log("mnop res:", { res });
-        if (res?.data?.result?.records?.length > 0) {
-          const normalizedChats = normalizedChat(res.data.result.records);
-          console.log("mnop:", { normalizedChats });
-            setState((prev:any)=>({...prev,messages:normalizedChats}))
-        } else {
-          onSend(currentUser?.startingMessage, null, false);
-        }
-      })
-      .catch((err) => {
-        console.error("cvbn:", err);
-      });
+    setState((prev: any) => ({ ...prev, messages: [] }));
+  }, []);
+
+  useEffect(() => {
+    let phone = localStorage.getItem("mobile");
+    if (phone === "") alert("Number required");
+    if (navigator.onLine) {
+      const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${socket.socketID}`;
+      //   const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${phone}`;
+      //  const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=103ceda6-8b92-4338-8615-230fe7e27472&userId=7597185708`;
+      axios
+        .get(url)
+        .then((res) => {
+          console.log("ghjk res:", { res });
+          if (res?.data?.result?.records?.length > 0) {
+            const normalizedChats = normalizedChat(res.data.result.records);
+            console.log("ghjk:", { normalizedChats });
+            setState((prev: any) => ({ ...prev, messages: normalizedChats }));
+          } else {
+            onSend(currentUser?.startingMessage, null, false);
+          }
+        })
+        .catch((err) => {
+          console.error("cvbn:", err);
+        });
+    } else {
+      if (localStorage.getItem("chatHistory")) {
+        console.log("ghjk ChatHistory:", localStorage.getItem("chatHistory"));
+        setState((prev: any) => ({
+          ...prev,
+          messages: localStorage.getItem("chatHistory"),
+        }));
+      }
+    }
   }, []);
 
   useEffect(() => {
     window &&
-      // window.androidInteract.onChatCompleted?.(
-      window.onChatCompleted?.(
+       window?.androidInteract?.onChatCompleted?.(
+     // window.onChatCompleted?.(
         String(currentUser?.id),
         JSON.stringify(currentMessageObj?.messages)
       );
-      console.log('triggered useeffect function');
-      window && console.log('window present');
+    console.log("window.androidInteract.onChatCompleted");
 
   }, [currentMessageObj?.messages?.length]);
 
   const handleSend = useCallback(
     (type: string, val: any) => {
       if (type === "text" && val.trim()) {
-        console.log("zzz:", { type, val });
-        appendMsg({
-          type: "text",
-          content: { text: val },
-          position: "right",
-        });
+        //@ts-ignore
         onSend(val, null, true);
       }
     },
     [onSend]
   );
 
+  const onLongPress = (content) => {
+    console.log("nnnn longpress is triggered", content);
+   window && window?.androidInteract?.onMsgSaveUpdate(content,'',currentUser?.id,true)
+  };
+
+  
   const renderMessageContent = useCallback(
     (msg: any) => {
       const { content, type } = msg;
+      console.log({ content });
       // return <Bubble content={content.text} />;
       switch (type) {
         case "text":
-          return <Bubble content={content.text} />;
+          return (
+            <div
+              style={{ display: "flex", alignItems: "center" }}
+             
+            >
+              <Bubble content={content.text} />
+              {content?.data?.position === "right" && (
+                <FontAwesomeIcon
+                  icon={faStar}
+                  size="lg"
+                  onClick={() => onLongPress(content)}
+                  color={true ? "var(--primaryyellow)" : ""}
+                />
+              )}
+            </div>
+          );
         case "image":
           return (
             <Bubble type="image">
@@ -145,6 +183,7 @@ const ChatUiWindow: FC<{
               <Bubble content={content.text} />
               <div style={{ marginTop: "10px" }} />
               <ScrollView
+                scrollX
                 data={content?.data?.choices}
                 // renderItem={(item:{key:string,text:string}) => <Button label={`${item.key} ${item.text}`} onClick={()=> selected({key:item.key,text:item.text,backmenu:false})}/>}
                 renderItem={(item: { key: string; text: string }) => (
@@ -173,15 +212,31 @@ const ChatUiWindow: FC<{
   );
 
   return (
-    <Chat
-      // navbar={{ title: 'Assistant' }}
-      //@ts-ignore
-      messages={chatUIMsg}
-      renderMessageContent={renderMessageContent}
-      onSend={handleSend}
-      locale="en-US"
-      placeholder="Ask Your Question"
-    />
+    <>
+      <Chat
+        // navbar={{ title: 'Assistant' }}
+        //@ts-ignore
+        messages={chatUIMsg}
+        renderMessageContent={renderMessageContent}
+        onQuickReplyClick={(e) => {
+          console.log("vvvv:", { e });
+        }}
+        onSend={handleSend}
+        locale="en-US"
+        placeholder="Ask Your Question"
+      />
+      <Popup
+        active={open}
+        title="Message starred"
+        onClose={() => setOpen(false)}
+      >
+        <div style={{ padding: "0px 15px" }}>
+          <p style={{ padding: "10px" }}>Your message has been starred.</p>
+
+          {/* <p style={{padding:'10px'}}>内容详情内容详情内容详情内容详情内容详情</p> */}
+        </div>
+      </Popup>
+    </>
   );
 };
 

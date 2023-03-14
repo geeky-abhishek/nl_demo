@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 import {
   registerOnMessageCallback,
   registerOnSessionCallback,
   send,
-} from './websocket';
-import { io, Socket } from 'socket.io-client';
-import { startWebsocketConnection } from './websocket';
-import { useCookies, withCookies } from 'react-cookie';
-import { useRouter } from 'next/router';
-import PhoneView from './PhoneView/index';
-import axios from 'axios';
+} from "./websocket";
+import { io, Socket } from "socket.io-client";
+import { startWebsocketConnection } from "./websocket";
+import { useCookies, withCookies } from "react-cookie";
+import { useRouter } from "next/router";
+import PhoneView from "./PhoneView/index";
+import axios from "axios";
 // import RecentChats from "./PhoneView/RecentChats";
 
 interface appProps {
@@ -49,7 +49,7 @@ const App: React.FC<appProps> = ({
   const router = useRouter();
 
   // For Authentication
-  const [accessToken, setAccessToken] = useState('');
+  const [accessToken, setAccessToken] = useState("");
   // const [recieved, setrecieved] = useState(false);
   const [cookies, setCookies] = useCookies();
   const [socket, setSocket] = useState<Socket>();
@@ -58,7 +58,7 @@ const App: React.FC<appProps> = ({
     user: string;
     phoneNumber: string | null;
     messages: any[];
-  }>({ user: 'Farmer Bot', phoneNumber: null, messages: [] });
+  }>({ user: "Farmer Bot", phoneNumber: null, messages: [] });
 
   const initialState: {
     allMessages: {
@@ -70,13 +70,11 @@ const App: React.FC<appProps> = ({
     username: string;
     session: any;
   } = {
-    allMessages: [{ user: 'Farmer Bot', phoneNumber: null, messages: [] }],
+    allMessages: [{ user: "Farmer Bot", phoneNumber: null, messages: [] }],
     messages: [],
-    username: '',
+    username: "",
     session: {},
   };
-
-  
 
   const [state, setState] = useState<{
     allMessages: {
@@ -96,7 +94,7 @@ const App: React.FC<appProps> = ({
   // useEffect(() => {
   //   setState(initialState);
   // }, [currentUser]);
-console.log("cvb:",{state})
+  console.log("cvb:", { state });
   useEffect(() => {
     // if (cookies['access_token'] !== undefined) {
     //   fetch(`http://localhost:3000/api/auth?token=${cookies['access_token']}`, {
@@ -132,7 +130,7 @@ console.log("cvb:",{state})
         user: string;
         phoneNumber: string | null;
         messages: any[];
-      }[] = JSON.parse(localStorage.getItem('allMessages') || '') || [];
+      }[] = JSON.parse(localStorage.getItem("allMessages") || "") || [];
       if (retrievedMessages.length !== 0) {
         setState({
           ...state,
@@ -148,17 +146,24 @@ console.log("cvb:",{state})
     setSocket(
       io(`${process.env.NEXT_PUBLIC_TRANSPORT_SOCKET_URL}`, {
         query: {
-          deviceId: `phone:${localStorage.getItem('mobile')}`,
-          token: `${localStorage.getItem('auth')}`,
+          deviceId: `phone:${localStorage.getItem("mobile")}`,
+          token: `${localStorage.getItem("auth")}`,
           // deviceId: `phone:9999404725`,
           // token: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjRwSFNCOUYteGw5OGZLSnJ0LVEyVDV6UjQ3cyJ9.eyJhdWQiOiIzMjBiMDIwYS0zZDg0LTRkOGEtYTE5MS1kYTRlOTcyYzI5NTEiLCJleHAiOjE2OTM0MTA4NTYsImlhdCI6MTY2MTg3NDg1NiwiaXNzIjoiYWNtZS5jb20iLCJzdWIiOiJhYzEyYzliMy05OWVkLTQzOTYtYjFlZC01NDRmMzY4NjIzYjkiLCJqdGkiOiI3NmNmMGNlMi0wYTUxLTQzM2EtYWFmOC1lMGMyNzUwOTg2MmIiLCJhdXRoZW50aWNhdGlvblR5cGUiOiJQQVNTV09SRCIsInByZWZlcnJlZF91c2VybmFtZSI6Im5sYXBwQHNhbWFncmEiLCJhcHBsaWNhdGlvbklkIjoiMzIwYjAyMGEtM2Q4NC00ZDhhLWExOTEtZGE0ZTk3MmMyOTUxIiwicm9sZXMiOlsiT3BlblJvbGUiXSwic2lkIjoiMzQ4YWU5ODgtMWFmMS00YTE2LWFmNzgtNmJkZjNlNWZkYTUwIiwiYXV0aF90aW1lIjoxNjYxODc0ODU2LCJ0aWQiOiIwMTA1NjZmZC1lMWNiLWM2NTgtYjY1OS1hMWQzZTA3MGJhYTgiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiT3BlblJvbGUiLCJESUVUIiwibWFuYXZfc2FtcGFkYSJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJPcGVuUm9sZSIsIlgtSGFzdXJhLVVzZXItSWQiOiJubGFwcEBzYW1hZ3JhMTIzIn19.KNypTTPaqLQKDzSGq6-8scr6WaQm_f7KGLhQ0pqorYQ8xeiqQPUKtkXBxVU0XpVzJLQkj6bMmv2QF5WyMf2-9KTqYQXtFL6HJ1Nt9GsHtqil4hqfVGK4efUH5dQeLo_PuS_pg0FXdkFT65vPlaFE0jzzjDiWbVlt0lkbdrbov_lIqkbORBnyehDMMKK5d4fmBBIrF1O_9RQFGJt8XB8TKoTCTN0Y4mVqEQ1vVAqH0NoVamja35g-pLj_PW0-T2phufnAbRe8J6IwMnabnlyuj07wbA6ffaarrCDN7aMq9aBHRYn0vqSm3k9aELBGYoeAa_zoXDbIDzlH8mgjQpkmGw`,
         },
       })
     );
+    console.log("ghjk:", {
+      mobile: localStorage?.getItem("mobile"),
+      auth: localStorage?.getItem("auth"),
+    });
     return () => {
-      console.log('unmount');
+      console.log("unmount");
     };
+    
   }, []);
+
+
 
   useEffect(() => {
     if (socket !== undefined) {
@@ -168,17 +173,17 @@ console.log("cvb:",{state})
 
   useEffect(() => {
     // if (router.query.state || cookies["access_token"] !== "") {
-      if (cookies['access_token'] !== '') {
-        registerOnMessageCallback(onMessageReceived);
-        registerOnSessionCallback(onSessionCreated);
-        scrollToBottom();
-      } else {
-        // navigate('/login');
-        console.log('login');
-      }
-      return () => {
-        console.log('unmounted');
-      };
+    if (cookies["access_token"] !== "") {
+      registerOnMessageCallback(onMessageReceived);
+      registerOnSessionCallback(onSessionCreated);
+      scrollToBottom();
+    } else {
+      // navigate('/login');
+      console.log("login");
+    }
+    return () => {
+      console.log("unmounted");
+    };
   }, [state]);
 
   const onSessionCreated = (session: { session: any }): void => {
@@ -189,8 +194,8 @@ console.log("cvb:",{state})
   };
 
   const onMessageReceived = (msg: any): void => {
-   console.log('cvb message: ', msg);
-    if (msg.content.msg_type === 'IMAGE') {
+    console.log("cvb message: ", msg);
+    if (msg.content.msg_type === "IMAGE") {
       setState({
         ...state,
         messages: state.messages.concat({
@@ -199,10 +204,10 @@ console.log("cvb:",{state})
           image: msg.content.media_url,
           choices: msg.content.choices,
           caption: msg.content.caption,
-          position:'left'
+          position: "left",
         }),
       });
-    } else if (msg.content.msg_type === 'AUDIO') {
+    } else if (msg.content.msg_type === "AUDIO") {
       setState({
         ...state,
         messages: state.messages.concat({
@@ -210,10 +215,10 @@ console.log("cvb:",{state})
           text: msg.content.title,
           audio: msg.content.media_url,
           choices: msg.content.choices,
-          position:'left'
+          position: "left",
         }),
       });
-    } else if (msg.content.msg_type === 'VIDEO') {
+    } else if (msg.content.msg_type === "VIDEO") {
       setState({
         ...state,
         messages: state.messages.concat({
@@ -221,10 +226,10 @@ console.log("cvb:",{state})
           text: msg.content.title,
           video: msg.content.media_url,
           choices: msg.content.choices,
-          position:'left'
+          position: "left",
         }),
       });
-    } else if (msg.content.msg_type === 'DOCUMENT') {
+    } else if (msg.content.msg_type === "DOCUMENT") {
       setState({
         ...state,
         messages: state.messages.concat({
@@ -232,17 +237,17 @@ console.log("cvb:",{state})
           text: msg.content.title,
           doc: msg.content.media_url,
           choices: msg.content.choices,
-          position:'left'
+          position: "left",
         }),
       });
-    } else if (msg.content.msg_type === 'TEXT') {
+    } else if (msg.content.msg_type === "TEXT") {
       setState({
         ...state,
         messages: state.messages.concat({
           username: currentUser.name,
           text: msg.content.title,
           choices: msg.content.choices,
-          position:'left'
+          position: "left",
         }),
       });
     }
@@ -253,7 +258,7 @@ console.log("cvb:",{state})
         username: currentUser.name,
         text: msg.content.title,
         choices: msg.content.choices,
-        position:'left'
+        position: "left",
       },
     ];
     const newCurrentMessageObj = {
@@ -271,33 +276,13 @@ console.log("cvb:",{state})
     });
     // setrecieved(true);
     newAllMessages.push(newCurrentMessageObj);
-    localStorage.setItem('allMessages', JSON.stringify(newAllMessages));
+    localStorage.setItem("allMessages", JSON.stringify(newAllMessages));
 
     setCurrentUserMessageObject(newCurrentMessageObj);
     setState({
       ...state,
       allMessages: newAllMessages,
     });
-
-    // if (msg.from.split(":")[1] === currentUser.number) {
-    //   setState({
-    //     ...state,
-    //     messages: state.messages.concat({
-    //       username: currentUser.name,
-    //       text: msg.content.title,
-    //       choices: msg.content.choices,
-    //     }),
-    //   });
-    // } else if (currentUser.number === null) {
-    //   setState({
-    //     ...state,
-    //     messages: state.messages.concat({
-    //       username: currentUser.name,
-    //       text: msg.content.title,
-    //       choices: msg.content.choices,
-    //     }),
-    //   });
-    // }
   };
 
   const onChangingCurrentUser = (name: string, phoneNumber: string | null) => {
@@ -320,20 +305,11 @@ console.log("cvb:",{state})
       allMessages: newAllMessages,
     });
 
-    // To Change the currentMessageObject
-    // const newCurrentMessageObject = state.allMessages.find((obj, index) => {
-    //   return obj.user === name && obj.phoneNumber === phoneNumber;
-    // });
-    // if (newCurrentMessageObject !== undefined) {
-    //   setCurrentUserMessageObject(newCurrentMessageObject);
-    // } else {
-    //   throw "userMessageObject Not Found!";
-    //   // setCurrentUserMessageObject({
-    //   //   user: "test",
-    //   //   phoneNumber: null,
-    //   //   messages: [],
-    //   // });
-    // }
+    setCurrentUserMessageObject({
+      user: name,
+      phoneNumber: phoneNumber,
+      messages: [],
+    });
 
     toChangeCurrentUser(name, phoneNumber);
   };
@@ -355,7 +331,7 @@ console.log("cvb:",{state})
     });
 
     newAllMessages.push(newCurrentMessageObj);
-    localStorage.setItem('allMessages', JSON.stringify(newAllMessages));
+    localStorage.setItem("allMessages", JSON.stringify(newAllMessages));
     setCurrentUserMessageObject(newCurrentMessageObj);
     setState({
       ...state,
@@ -370,61 +346,59 @@ console.log("cvb:",{state})
   //   });
   // };
 
-  const sendMessage = (text: string, media: any,isVisibile=true): void => {
+  const sendMessage = (text: string, media: any, isVisibile = true): void => {
     // if (!accessToken) {
     //   router.push('/login');
     // } else {
-      // send(text, state.session, accessToken, currentUser, socket,null);
-     send(text, state.session, accessToken, currentUser, socket, null);
-      console.log("cvb:",{text,media,isVisibile})
-       if(isVisibile)
+    // send(text, state.session, accessToken, currentUser, socket,null);
+    send(text, state.session, accessToken, currentUser, socket, null);
+    console.log("cvb:", { text, media, isVisibile });
+    if (isVisibile)
       if (media) {
-        if (media.mimeType.slice(0, 5) === 'image' ) {
-         
+        if (media.mimeType.slice(0, 5) === "image") {
           setState({
             ...state,
             messages: state.messages.concat({
               username: state.username,
               image: media.url,
-              position:'right'
+              position: "right",
             }),
           });
-        } else if (media.mimeType.slice(0, 5) === 'audio' && isVisibile) {
+        } else if (media.mimeType.slice(0, 5) === "audio" && isVisibile) {
           setState({
             ...state,
             messages: state.messages.concat({
               username: state.username,
               audio: media.url,
-              position:'right'
+              position: "right",
             }),
           });
-        } else if (media.mimeType.slice(0, 5) === 'video') {
+        } else if (media.mimeType.slice(0, 5) === "video") {
           setState({
             ...state,
             messages: state.messages.concat({
               username: state.username,
               video: media.url,
-              position:'right'
+              position: "right",
             }),
           });
-        } else if (media.mimeType.slice(0, 11) === 'application' ) {
+        } else if (media.mimeType.slice(0, 11) === "application") {
           setState({
             ...state,
             messages: state.messages.concat({
               username: state.username,
               doc: media.url,
-              position:'right'
+              position: "right",
             }),
           });
         } else {
-         
           setState({
             ...state,
             messages: state.messages.concat({
               username: state.username,
               text: text,
               doc: media.url,
-              position:'right'
+              position: "right",
             }),
           });
         }
@@ -434,7 +408,7 @@ console.log("cvb:",{state})
           {
             username: state.username,
             text: text,
-            position:'right'
+            position: "right",
           },
         ];
 
@@ -454,12 +428,12 @@ console.log("cvb:",{state})
         });
 
         newAllMessages.push(newCurrentMessageObj);
-        localStorage.setItem('allMessages', JSON.stringify(newAllMessages));
+        localStorage.setItem("allMessages", JSON.stringify(newAllMessages));
 
         // setrecieved(false);
         //  send(text, state.session, accessToken, currentUser, socket, null);
 
-        console.log('this is');
+        console.log("this is");
         console.log(newCurrentMessageObj);
         setCurrentUserMessageObject(newCurrentMessageObj);
         setState({
@@ -493,14 +467,12 @@ console.log("cvb:",{state})
     // })
   };
 
- 
-
   const selected = (option: {
     key: string;
     text: string;
     backmenu: boolean;
   }): void => {
-    const toSend = option.key + ' ' + option.text;
+    const toSend = option.key + " " + option.text;
     sendMessage(toSend, null);
   };
 
@@ -521,70 +493,12 @@ console.log("cvb:",{state})
       setState={setCurrentUserMessageObject}
       onSendLocation={sendLocation}
       toShowChats={{
-        name: '',
+        name: "",
         number: null,
       }}
+      socket={state.session}
     />
   );
-  //     } else {
-  //       return (
-  //         <WebView
-  //         currentMessageObj={currentUserMessageObject}
-  //         toClearChat={onClearingChat}
-  //         messages={state.messages}
-  //         // recieved={recieved}
-  //       username={state.username}
-  //       selected={selected}
-  //       sendMessageFunc={sendMessage}
-  //       allUsers={allUsers}
-  //       toChangeCurrentUser={onChangingCurrentUser}
-  //       currentUser={currentUser}
-  //       onSendLocation={sendLocation}
-  //     />
-  //   );
-  // }
 };
 
 export default App;
-
-// function useWindowSize() {
-//   // Initialize state with undefined width/height so server and client renders match
-//   // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
-//   const [windowSize, setWindowSize] = useState({
-//     width: 0,
-//     height: 0,
-//   });
-
-//   useEffect(() => {
-//     // only execute all the code below in client side
-//     if (typeof window !== "undefined") {
-//       // Handler to call on window resize
-
-//       // Set window width/height to state
-
-//       // Add event listener
-//       window.addEventListener("resize", () => {
-//         setWindowSize({
-//           width: window.innerWidth,
-//           height: window.innerHeight,
-//         });
-//       });
-
-//       // Call handler right away so state gets updated with initial window size
-//       setWindowSize({
-//         width: window.innerWidth,
-//         height: window.innerHeight,
-//       });
-
-//       // Remove event listener on cleanup
-//       return () =>
-//         window.removeEventListener("resize", () => {
-//           setWindowSize({
-//             width: window.innerWidth,
-//             height: window.innerHeight,
-//           });
-//         });
-//     }
-//   }, []); // Empty array ensures that effect is only run on mount
-//   return windowSize;
-// }
