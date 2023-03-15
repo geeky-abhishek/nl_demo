@@ -69,15 +69,15 @@ const {toggleChatWindow} =useContext(PhoneViewContext)
       {/* Top Section */}
       <Box className={`${styles.top_section} ${backgroundColorToggle}`}>
         {/* For the back button */}
-        <Box flex="1.5" className={headingColorToggle}>
+        <Box flex="1.5" className={headingColorToggle} style={{textAlign: 'center'}}>
           <Button
             style={{
               border: "none",
-              padding: "1rem",
-              borderRadius: "1.5rem",
+              padding: "0",
+              borderRadius: "50%",
             }}
             onClick={toggleChatWindow}
-            size="lg"
+            size="sm"
             variant="ghost"
             fontSize="lg"
           >

@@ -23,7 +23,7 @@ const normalizedChat = (chats: any) => {
   return chats.map((chat) => ({
     text: chat?.payload?.text,
     username: chat?.userId,
-    position: chats?.messageState === "REPLIED" ? "left" : "right",
+    position: chat?.messageState === "SENT" ? "left" : "right",
     //choices:
   }));
 };
@@ -52,6 +52,9 @@ const ChatUiWindow: FC<{
   messagesog: messageProps[];
   username: string;
   chatUiMsg: Array<any>;
+  currentUser: any;
+  setState: any;
+  socket: any;
   selected: (option: { key: string; text: string; backmenu: boolean }) => void;
 }> = ({
   currentMessageObj,
@@ -85,13 +88,13 @@ const ChatUiWindow: FC<{
 
   useEffect(() => {
     setState((prev: any) => ({ ...prev, messages: [] }));
-  }, []);
+  }, [setState]);
 
   useEffect(() => {
     let phone = localStorage.getItem("mobile");
     if (phone === "") alert("Number required");
     if (navigator.onLine) {
-      const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${localStorage.getItem('socketID')}`;
+      const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=16-03-2023&startDate=14-03-2023&botId=${currentUser?.id}&userId=${localStorage.getItem('socketID')}`;
       //   const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${phone}`;
       //  const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=103ceda6-8b92-4338-8615-230fe7e27472&userId=7597185708`;
       axios
@@ -155,8 +158,8 @@ const ChatUiWindow: FC<{
     try{
       window && window?.androidInteract?.onMsgSaveUpdate(content,'',currentUser?.id,true)
       window && window?.androidInteract?.onEvent(JSON.stringify(content));;
-    }catch(er){
-      window &&  window?.androidInteract?.onEvent(`error in onMsgSaveUpdate func:${JSON.stringify(err)}`);
+    }catch(err){
+      window && window?.androidInteract?.onEvent(`error in onMsgSaveUpdate func:${JSON.stringify(err)}`);
     }
   };
 
