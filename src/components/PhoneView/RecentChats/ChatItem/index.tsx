@@ -1,23 +1,32 @@
-import React from "react";
+import React,{useContext} from "react";
 import { Box, useColorModeValue } from "@chakra-ui/react";
 import styles from "./index.module.css";
 import { useState } from "react";
 import Image from 'next/image'
 import profilePic from '../../../../assets/images/killua.jpg';
-
+import {AppContext} from '../../../../utils/app-context';
+import { User } from "../../../../types";
+import { PhoneViewContext } from "../../../../utils/phone-view-context";
 interface chatItemProps {
   active: boolean;
   name: string;
   phoneNumber: string | null;
   toChangeCurrentUser: (name: string, number: string | null) => void;
+  user:User
 }
 
 const ChatItem: React.FC<chatItemProps> = ({
   active,
   name,
   phoneNumber,
-  toChangeCurrentUser,
+  user,
+  isBlank
+ // toChangeCurrentUser,
 }) => {
+
+  const context=useContext(AppContext);
+  const {toggleChatWindow} =useContext(PhoneViewContext)
+  // console.log("qwerty:",{context})
   const backgroundColorToggle = useColorModeValue(
     styles.lightContainer,
     styles.darkContainer
@@ -32,7 +41,7 @@ const ChatItem: React.FC<chatItemProps> = ({
   );
 
   const [toShowProfile, setToShowProfile] = useState(false);
-
+  console.log('qwerty d:',{user})
   const onChangingCurrentUserHandler: React.MouseEventHandler = (
     e: React.MouseEvent
   ) => {
@@ -40,7 +49,11 @@ const ChatItem: React.FC<chatItemProps> = ({
     // setTimeout(()=>{
     //   toChangeCurrentUser(name, phoneNumber)
     // },300);
-     toChangeCurrentUser(name, phoneNumber);
+    console.log('qwerty:',{user})
+    context?.toChangeCurrentUser(user);
+    toggleChatWindow();
+    
+
   };
 
   const showProfileModal: React.MouseEventHandler = (e: React.MouseEvent) => {
@@ -59,7 +72,7 @@ const ChatItem: React.FC<chatItemProps> = ({
           }`}
       >
         <div className={styles.avatar}>
-          <Image src={profilePic} height={'100%'} width={'100%'}/>
+       {!isBlank && <Image src={profilePic} height={'100%'} width={'100%'}/>}   
         </div>
         <Box className={`${styles.chatItem_text}`}>
           <Box

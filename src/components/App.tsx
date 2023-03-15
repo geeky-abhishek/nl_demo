@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   registerOnMessageCallback,
   registerOnSessionCallback,
@@ -10,12 +10,14 @@ import { useCookies, withCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import PhoneView from "./PhoneView/index";
 import axios from "axios";
+import { PhoneViewContext } from "../utils/phone-view-context";
 // import RecentChats from "./PhoneView/RecentChats";
 
 interface appProps {
   currentUser: { name: string; number: string | null };
   allUsers: { name: string; number: string | null; active: boolean }[];
-  toChangeCurrentUser: (name: string, number: string | null) => void;
+  // toChangeCurrentUser: (name: string, number: string | null) => void;
+  toChangeCurrentUser: (arg: { name: string; number: string | null }) => void;
   // toShowChats: (name: string, number: string | null) => void;
 }
 
@@ -47,6 +49,9 @@ const App: React.FC<appProps> = ({
 }) => {
   // Router for Navigation
   const router = useRouter();
+console.log("qwerty:",{currentUser})
+  const [toggleView, setToggleView] = useState(true);
+  const [starredView, setStarredView] = useState(false);
 
   // For Authentication
   const [accessToken, setAccessToken] = useState("");
@@ -137,33 +142,38 @@ const App: React.FC<appProps> = ({
           allMessages: retrievedMessages,
         });
       }
+      window && window?.androidInteract?.onEvent(localStorage.getItem("allMessages") || "");
     } catch (err) {
       console.log(err);
+      window &&  window?.androidInteract?.onEvent(`error in fetching allMessages:${JSON.stringify(err)}`);
     }
   }, []);
 
   useEffect(() => {
-    setSocket(
-      io(`${process.env.NEXT_PUBLIC_TRANSPORT_SOCKET_URL}`, {
-        query: {
-          deviceId: `phone:${localStorage.getItem("mobile")}`,
-          token: `${localStorage.getItem("auth")}`,
-          // deviceId: `phone:9999404725`,
-          // token: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjRwSFNCOUYteGw5OGZLSnJ0LVEyVDV6UjQ3cyJ9.eyJhdWQiOiIzMjBiMDIwYS0zZDg0LTRkOGEtYTE5MS1kYTRlOTcyYzI5NTEiLCJleHAiOjE2OTM0MTA4NTYsImlhdCI6MTY2MTg3NDg1NiwiaXNzIjoiYWNtZS5jb20iLCJzdWIiOiJhYzEyYzliMy05OWVkLTQzOTYtYjFlZC01NDRmMzY4NjIzYjkiLCJqdGkiOiI3NmNmMGNlMi0wYTUxLTQzM2EtYWFmOC1lMGMyNzUwOTg2MmIiLCJhdXRoZW50aWNhdGlvblR5cGUiOiJQQVNTV09SRCIsInByZWZlcnJlZF91c2VybmFtZSI6Im5sYXBwQHNhbWFncmEiLCJhcHBsaWNhdGlvbklkIjoiMzIwYjAyMGEtM2Q4NC00ZDhhLWExOTEtZGE0ZTk3MmMyOTUxIiwicm9sZXMiOlsiT3BlblJvbGUiXSwic2lkIjoiMzQ4YWU5ODgtMWFmMS00YTE2LWFmNzgtNmJkZjNlNWZkYTUwIiwiYXV0aF90aW1lIjoxNjYxODc0ODU2LCJ0aWQiOiIwMTA1NjZmZC1lMWNiLWM2NTgtYjY1OS1hMWQzZTA3MGJhYTgiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiT3BlblJvbGUiLCJESUVUIiwibWFuYXZfc2FtcGFkYSJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJPcGVuUm9sZSIsIlgtSGFzdXJhLVVzZXItSWQiOiJubGFwcEBzYW1hZ3JhMTIzIn19.KNypTTPaqLQKDzSGq6-8scr6WaQm_f7KGLhQ0pqorYQ8xeiqQPUKtkXBxVU0XpVzJLQkj6bMmv2QF5WyMf2-9KTqYQXtFL6HJ1Nt9GsHtqil4hqfVGK4efUH5dQeLo_PuS_pg0FXdkFT65vPlaFE0jzzjDiWbVlt0lkbdrbov_lIqkbORBnyehDMMKK5d4fmBBIrF1O_9RQFGJt8XB8TKoTCTN0Y4mVqEQ1vVAqH0NoVamja35g-pLj_PW0-T2phufnAbRe8J6IwMnabnlyuj07wbA6ffaarrCDN7aMq9aBHRYn0vqSm3k9aELBGYoeAa_zoXDbIDzlH8mgjQpkmGw`,
-        },
-      })
-    );
-    console.log("ghjk:", {
-      mobile: localStorage?.getItem("mobile"),
-      auth: localStorage?.getItem("auth"),
-    });
+    try{
+      setSocket(
+        io(`${process.env.NEXT_PUBLIC_TRANSPORT_SOCKET_URL}`, {
+          query: {
+            deviceId: `phone:${localStorage.getItem("mobile")}`,
+            token: `${localStorage.getItem("auth")}`,
+            // deviceId: `phone:9999404725`,
+            // token: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjRwSFNCOUYteGw5OGZLSnJ0LVEyVDV6UjQ3cyJ9.eyJhdWQiOiIzMjBiMDIwYS0zZDg0LTRkOGEtYTE5MS1kYTRlOTcyYzI5NTEiLCJleHAiOjE2OTM0MTA4NTYsImlhdCI6MTY2MTg3NDg1NiwiaXNzIjoiYWNtZS5jb20iLCJzdWIiOiJhYzEyYzliMy05OWVkLTQzOTYtYjFlZC01NDRmMzY4NjIzYjkiLCJqdGkiOiI3NmNmMGNlMi0wYTUxLTQzM2EtYWFmOC1lMGMyNzUwOTg2MmIiLCJhdXRoZW50aWNhdGlvblR5cGUiOiJQQVNTV09SRCIsInByZWZlcnJlZF91c2VybmFtZSI6Im5sYXBwQHNhbWFncmEiLCJhcHBsaWNhdGlvbklkIjoiMzIwYjAyMGEtM2Q4NC00ZDhhLWExOTEtZGE0ZTk3MmMyOTUxIiwicm9sZXMiOlsiT3BlblJvbGUiXSwic2lkIjoiMzQ4YWU5ODgtMWFmMS00YTE2LWFmNzgtNmJkZjNlNWZkYTUwIiwiYXV0aF90aW1lIjoxNjYxODc0ODU2LCJ0aWQiOiIwMTA1NjZmZC1lMWNiLWM2NTgtYjY1OS1hMWQzZTA3MGJhYTgiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiT3BlblJvbGUiLCJESUVUIiwibWFuYXZfc2FtcGFkYSJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJPcGVuUm9sZSIsIlgtSGFzdXJhLVVzZXItSWQiOiJubGFwcEBzYW1hZ3JhMTIzIn19.KNypTTPaqLQKDzSGq6-8scr6WaQm_f7KGLhQ0pqorYQ8xeiqQPUKtkXBxVU0XpVzJLQkj6bMmv2QF5WyMf2-9KTqYQXtFL6HJ1Nt9GsHtqil4hqfVGK4efUH5dQeLo_PuS_pg0FXdkFT65vPlaFE0jzzjDiWbVlt0lkbdrbov_lIqkbORBnyehDMMKK5d4fmBBIrF1O_9RQFGJt8XB8TKoTCTN0Y4mVqEQ1vVAqH0NoVamja35g-pLj_PW0-T2phufnAbRe8J6IwMnabnlyuj07wbA6ffaarrCDN7aMq9aBHRYn0vqSm3k9aELBGYoeAa_zoXDbIDzlH8mgjQpkmGw`,
+          },
+        })
+      );
+      console.log("ghjk:", {
+        mobile: localStorage?.getItem("mobile"),
+        auth: localStorage?.getItem("auth"),
+      });
+      window && window?.androidInteract?.onEvent(localStorage.getItem("mobile"));
+      window && window?.androidInteract?.onEvent(localStorage.getItem("auth"));
+    }catch(err){
+      window &&  window?.androidInteract?.onEvent(`error in fetching mobile,auth:${JSON.stringify(err)}`);
+    }
     return () => {
       console.log("unmount");
     };
-    
   }, []);
-
-
 
   useEffect(() => {
     if (socket !== undefined) {
@@ -187,9 +197,14 @@ const App: React.FC<appProps> = ({
   }, [state]);
 
   const onSessionCreated = (session: { session: any }): void => {
+   
+    if(!localStorage.getItem('socketID')){
+      localStorage.setItem('socketID', session?.socketID);
+    }
+    console.log()
     setState({
       ...state,
-      session: session,
+      session,
     });
   };
 
@@ -199,7 +214,7 @@ const App: React.FC<appProps> = ({
       setState({
         ...state,
         messages: state.messages.concat({
-          username: currentUser.name,
+          username: currentUser?.name,
           text: msg.content.title,
           image: msg.content.media_url,
           choices: msg.content.choices,
@@ -211,7 +226,7 @@ const App: React.FC<appProps> = ({
       setState({
         ...state,
         messages: state.messages.concat({
-          username: currentUser.name,
+          username: currentUser?.name,
           text: msg.content.title,
           audio: msg.content.media_url,
           choices: msg.content.choices,
@@ -222,7 +237,7 @@ const App: React.FC<appProps> = ({
       setState({
         ...state,
         messages: state.messages.concat({
-          username: currentUser.name,
+          username: currentUser?.name,
           text: msg.content.title,
           video: msg.content.media_url,
           choices: msg.content.choices,
@@ -233,7 +248,7 @@ const App: React.FC<appProps> = ({
       setState({
         ...state,
         messages: state.messages.concat({
-          username: currentUser.name,
+          username: currentUser?.name,
           text: msg.content.title,
           doc: msg.content.media_url,
           choices: msg.content.choices,
@@ -244,7 +259,7 @@ const App: React.FC<appProps> = ({
       setState({
         ...state,
         messages: state.messages.concat({
-          username: currentUser.name,
+          username: currentUser?.name,
           text: msg.content.title,
           choices: msg.content.choices,
           position: "left",
@@ -255,7 +270,7 @@ const App: React.FC<appProps> = ({
     const newMessageList = [
       ...currentUserMessageObject.messages,
       {
-        username: currentUser.name,
+        username: currentUser?.name,
         text: msg.content.title,
         choices: msg.content.choices,
         position: "left",
@@ -286,7 +301,7 @@ const App: React.FC<appProps> = ({
   };
 
   const onChangingCurrentUser = (name: string, phoneNumber: string | null) => {
-    if (name === currentUser.name && phoneNumber === currentUser.number) {
+    if (name === currentUser?.name && phoneNumber === currentUser?.number) {
       return;
     }
     // To Save the currentMessageObject in allMessages
@@ -311,7 +326,7 @@ const App: React.FC<appProps> = ({
       messages: [],
     });
 
-    toChangeCurrentUser(name, phoneNumber);
+    toChangeCurrentUser({ name, number: phoneNumber });
   };
 
   const onClearingChat = () => {
@@ -351,6 +366,7 @@ const App: React.FC<appProps> = ({
     //   router.push('/login');
     // } else {
     // send(text, state.session, accessToken, currentUser, socket,null);
+
     send(text, state.session, accessToken, currentUser, socket, null);
     console.log("cvb:", { text, media, isVisibile });
     if (isVisibile)
@@ -451,6 +467,7 @@ const App: React.FC<appProps> = ({
     // }
   };
 
+  const toggleChatWindow=useCallback(()=>setToggleView(prev=>!prev),[])
   const sendLocation = (location: any): void => {
     send(location, state.session, accessToken, currentUser, socket, null);
     // navigator.geolocation.getCurrentPosition((position: any) => {
@@ -478,26 +495,66 @@ const App: React.FC<appProps> = ({
 
   // const sizeVar = useWindowSize();
   // if (sizeVar.width < 768) {
-  return (
-    <PhoneView
-      currentMessageObj={currentUserMessageObject}
-      toClearChat={onClearingChat}
-      messages={state.messages}
+
+  const contextValues = useMemo(
+    () => ({
+      currentMessageObj: currentUserMessageObject,
+      toClearChat: onClearingChat,
+      messages: state.messages,
       // recieved={recieved}
-      username={state.username}
-      selected={selected}
-      sendMessageFunc={sendMessage}
-      allUsers={allUsers}
-      toChangeCurrentUser={onChangingCurrentUser}
-      currentUser={currentUser}
-      setState={setCurrentUserMessageObject}
-      onSendLocation={sendLocation}
-      toShowChats={{
-        name: "",
-        number: null,
-      }}
-      socket={state.session}
-    />
+      username: state.username,
+      selected,
+      sendMessageFunc: sendMessage,
+      allUsers,
+      toChangeCurrentUser: onChangingCurrentUser,
+      currentUser,
+      setState: setCurrentUserMessageObject,
+      onSendLocation: sendLocation,
+      socket: state.session,
+      toggleView,
+      setToggleView,
+      starredView,
+      setStarredView,
+      toggleChatWindow
+    }),
+    [
+      state,
+      currentUserMessageObject,
+      onClearingChat,
+      selected,
+      sendMessage,
+      allUsers,
+      setCurrentUserMessageObject,
+      sendLocation,
+      toggleView,
+      setToggleView,
+      starredView,
+      setStarredView,
+      toggleChatWindow
+    ]
+  );
+  return (
+    <PhoneViewContext.Provider value={contextValues}>
+      <PhoneView
+        currentMessageObj={currentUserMessageObject}
+        toClearChat={onClearingChat}
+        messages={state.messages}
+        // recieved={recieved}
+        username={state.username}
+        selected={selected}
+        sendMessageFunc={sendMessage}
+        allUsers={allUsers}
+        toChangeCurrentUser={onChangingCurrentUser}
+        currentUser={currentUser}
+        setState={setCurrentUserMessageObject}
+        onSendLocation={sendLocation}
+        toShowChats={{
+          name: "",
+          number: null,
+        }}
+        socket={state.session}
+      />
+    </PhoneViewContext.Provider>
   );
 };
 

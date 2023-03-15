@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Box, Flex, Button } from "@chakra-ui/react";
 import styles from "./index.module.css";
 import { useColorModeValue, IconButton } from "@chakra-ui/react";
@@ -7,6 +7,7 @@ import { faChevronLeft, faShower } from "@fortawesome/free-solid-svg-icons";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import profilePic from "../../../assets/images/killua.jpg";
+import { PhoneViewContext } from "../../../utils/phone-view-context";
 
 const ChatUiWindow = dynamic(() => import("./ChatUiWindow"), {
   ssr: false,
@@ -56,7 +57,7 @@ const ChatWindow: React.FC<chatWindowProps> = ({
     styles.darkUsername
   );
   console.log("vvv:", { currentUser });
-
+const {toggleChatWindow} =useContext(PhoneViewContext)
   
   return (
     <Flex
@@ -75,7 +76,7 @@ const ChatWindow: React.FC<chatWindowProps> = ({
               padding: "1rem",
               borderRadius: "1.5rem",
             }}
-            onClick={toShowChats}
+            onClick={toggleChatWindow}
             size="lg"
             variant="ghost"
             fontSize="lg"

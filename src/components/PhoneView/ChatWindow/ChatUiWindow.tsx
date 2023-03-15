@@ -91,7 +91,7 @@ const ChatUiWindow: FC<{
     let phone = localStorage.getItem("mobile");
     if (phone === "") alert("Number required");
     if (navigator.onLine) {
-      const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${socket.socketID}`;
+      const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${localStorage.getItem('socketID')}`;
       //   const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=${currentUser?.id}&userId=${phone}`;
       //  const url = `http://143.110.255.220:8080/xmsg/conversation-history?provider=pwa&endDate=11-03-2023&startDate=07-03-2023&botId=103ceda6-8b92-4338-8615-230fe7e27472&userId=7597185708`;
       axios
@@ -101,6 +101,7 @@ const ChatUiWindow: FC<{
           if (res?.data?.result?.records?.length > 0) {
             const normalizedChats = normalizedChat(res.data.result.records);
             console.log("ghjk:", { normalizedChats });
+            window && window?.androidInteract?.onEvent(JSON.stringify(normalizedChats));
             setState((prev: any) => ({ ...prev, messages: normalizedChats }));
           } else {
             onSend(currentUser?.startingMessage, null, false);
@@ -108,26 +109,34 @@ const ChatUiWindow: FC<{
         })
         .catch((err) => {
           console.error("cvbn:", err);
+          window && window?.androidInteract?.onEvent(`error in fetching chat history(online):${JSON.stringify(err)}`);
         });
     } else {
-      if (localStorage.getItem("chatHistory")) {
-        console.log("ghjk ChatHistory:", localStorage.getItem("chatHistory"));
-        setState((prev: any) => ({
-          ...prev,
-          messages: localStorage.getItem("chatHistory"),
-        }));
-      }
-    }
+      try{
+        if (localStorage.getItem("chatHistory")) {
+          console.log("ghjk ChatHistory:", localStorage.getItem("chatHistory"));
+          window && window?.androidInteract?.onEvent(localStorage.getItem("chatHistory"));setState((prev: any) => ({
+            ...prev,
+            messages: localStorage.getItem("chatHistory"),
+          }));
+        }
+      }catch(err){
+        window && window?.androidInteract?.onEvent(`error in getting chat history(offline):${JSON.stringify(err)}`);
+      }  }
   }, []);
 
   useEffect(() => {
-    window &&
-       window?.androidInteract?.onChatCompleted?.(
-     // window.onChatCompleted?.(
+    try{
+      window && window?.androidInteract?.onChatCompleted?.(
+     // window && window.onChatCompleted?.(
         String(currentUser?.id),
         JSON.stringify(currentMessageObj?.messages)
       );
-    console.log("window.androidInteract.onChatCompleted");
+      console.log("window.androidInteract.onChatCompleted");
+      window && window?.androidInteract?.onEvent(JSON.stringify(currentMessageObj?.messages));
+    }catch(err){
+      window && window?.androidInteract?.onEvent(`error in onChatCompleted func:${JSON.stringify(err)}`);
+    }
 
   }, [currentMessageObj?.messages?.length]);
 
@@ -143,7 +152,12 @@ const ChatUiWindow: FC<{
 
   const onLongPress = (content) => {
     console.log("nnnn longpress is triggered", content);
-   window && window?.androidInteract?.onMsgSaveUpdate(content,'',currentUser?.id,true)
+    try{
+      window && window?.androidInteract?.onMsgSaveUpdate(content,'',currentUser?.id,true)
+      window && window?.androidInteract?.onEvent(JSON.stringify(content));;
+    }catch(er){
+      window &&  window?.androidInteract?.onEvent(`error in onMsgSaveUpdate func:${JSON.stringify(err)}`);
+    }
   };
 
   

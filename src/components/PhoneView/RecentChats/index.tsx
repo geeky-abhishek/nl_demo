@@ -5,16 +5,17 @@ import ChatItem from "./ChatItem";
 
 interface recentChatsProps {
   allUsers: { name: string; number: string | null; active: boolean }[];
-  toChangeCurrentUser: (name: string, number: string | null) => void;
-  toShowChatWindow: () => void
-  toShowStarredView: () => void
+  // toChangeCurrentUser: (name: string, number: string | null) => void;
+  toChangeCurrentUser: (arg: { name: string; number: string | null }) => void;
+  toShowChatWindow: () => void;
+  toShowStarredView: () => void;
 }
 
 const RecentChats: React.FC<recentChatsProps> = ({
   allUsers,
   toChangeCurrentUser,
   toShowChatWindow,
-  toShowStarredView
+  toShowStarredView,
 }) => {
   const backgroundColorToggle = useColorModeValue(
     styles.lightContainer,
@@ -34,15 +35,15 @@ const RecentChats: React.FC<recentChatsProps> = ({
     name: string,
     number: string | null
   ) => {
-    toChangeCurrentUser(name, number);
+    toChangeCurrentUser({ name, number });
     toShowChatWindow();
   };
 
   const StarredViewHandler = () => {
     toShowStarredView();
-  }
+  };
 
-  console.log("hjk:", { allUsers })
+  console.log("hjk:", { allUsers });
   return (
     <Flex
       flexDirection="column"
@@ -59,23 +60,40 @@ const RecentChats: React.FC<recentChatsProps> = ({
         {/* Chat Section */}
 
         <Box className={`${styles.backBox} ${backBoxToggle}`}>
-          <button className={`${styles.starred}`} onClick={StarredViewHandler}>Starred Messages</button>
+          <button className={`${styles.starred}`} onClick={StarredViewHandler}>
+            Starred Messages
+          </button>
           <Box className={styles.chatList}>
-            {(allUsers ?? [])?.map((user, index) => {
-              return (
-                <ChatItem
-                  toChangeCurrentUser={onchangingCurrentUserHandler}
-                  key={index}
-                  active={user.active}
-                  name={user.name}
-                  phoneNumber={user.number}
-                />
-              );
-            })}
+            {allUsers.length > 0 ? (
+              <>
+                {(allUsers ?? [])?.map((user, index) => {
+                  return (
+                    <ChatItem
+                      toChangeCurrentUser={onchangingCurrentUserHandler}
+                      key={index}
+                      active={user.active}
+                      name={user.name}
+                      phoneNumber={user.number}
+                      user={user}
+                    />
+                  );
+                })}
+              </>
+            ) : (
+              <ChatItem
+                toChangeCurrentUser={() => null}
+                key={0}
+                active={false}
+                name={"No Bots Available"}
+                phoneNumber={""}
+                user={{}}
+                isBlank
+              />
+            )}
 
+            
           </Box>
         </Box>
-
       </Box>
     </Flex>
   );

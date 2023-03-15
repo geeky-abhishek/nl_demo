@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import App from "../components/App";
@@ -10,18 +10,18 @@ import PhoneView from "../components/PhoneView";
 import { CookiesProvider } from "react-cookie";
 // import { ColorModeScript, Flex, Box } from "@chakra-ui/react";
 import NoSSR from "react-no-ssr";
+import { AppContext } from "../utils/app-context";
+import { find, map } from "lodash";
+import { User } from "../types";
 const Loading = () => <div>Loading...</div>;
 
 const Home: NextPage = () => {
   // All Users
   const [users, setUsers] = useState<
-    { name: string; number: string | null; active: boolean }[]
+    User[] 
   >([]);
 
-  const [currentUser, setCurrentUser] = useState<{
-    name: string;
-    number: string | null;
-  }>({});
+  const [currentUser, setCurrentUser] = useState<User>();
 
   // useEffect(async () => {
   //   try {
@@ -44,65 +44,99 @@ const Home: NextPage = () => {
   //   }
   // }, []);
 
-  console.log("vbnm:");
-
+  
+// getting botList from android and fetching bot details
   useEffect(() => {
     //@ts-ignore
-    const list =
+    try{
+      const list =
       localStorage.getItem("botList") || localStorage.getItem("chatList");
-    const urls = (
-      list
-        ? JSON.parse(list)
-        : [
-            'd0dad28e-8b84-4bc9-92ab-f22f90c2432a',
-            'd655cf03-1f6f-4510-acf6-d3f51b488a5e',
-            'd3ed4174-3c55-4c60-b11b-facbad31a5aa',
-            '487e1d4f-a781-468e-b2ec-c83c3f2b2dee',
-          ]
-    )
-    //const urls = (list ? JSON.parse(list) : [])
-    .map(
-      (botId: string) =>
-        `${process.env.NEXT_PUBLIC_UCI_BASE_URL}/admin/v1/bot/get/${botId}`
-    );
+      //@ts-ignore
+      console.log('hjkl zxcv:',{botList:JSON.parse(list)});
+      window && window?.androidInteract?.onEvent(list);
+      const urls = (
+        list
+          ? JSON.parse(list)
+          : [
+              "d0dad28e-8b84-4bc9-92ab-f22f90c2432a",
+              "d655cf03-1f6f-4510-acf6-d3f51b488a5e",
+              "d3ed4174-3c55-4c60-b11b-facbad31a5aa",
+              "487e1d4f-a781-468e-b2ec-c83c3f2b2dee",
+            ]
+      )
+      //const urls = (list ? JSON.parse(list) : [])
+      .map(
+        (botId: string) =>
+          `${process.env.NEXT_PUBLIC_UCI_BASE_URL}/admin/v1/bot/get/${botId}`
+      );
 
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        ownerID: "95e4942d-cbe8-477d-aebd-ad8e6de4bfc8",
-        ownerOrgID: "ORG_001",
-      },
-    };
-    const requests = urls.map((url) => axios.get(url, config));
-    axios
-      .all(requests)
-      .then((responses) => {
-        console.log("hjkl:", { responses });
-        const usersList = responses?.map((res) => res?.data?.result?.data);
-        console.log("zxcv user:", { usersList });
-        setUsers(usersList);
-        console.log('onBotDetailsLoaded running now.')
-        window?.androidInteract?.onBotDetailsLoaded(JSON.stringify(usersList));
-        setCurrentUser(usersList?.[0]);
-      })
-      .catch((err) => {
-        console.log("hjkl:", { err });
-      });
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          ownerID: "95e4942d-cbe8-477d-aebd-ad8e6de4bfc8",
+          ownerOrgID: "ORG_001",
+        },
+      };
+  
+      const requests = urls.map((url:string) => axios.get(url, config));
+      axios
+        .all(requests)
+        .then((responses) => {
+          console.log("hjkl:", { responses });
+          const usersList = responses?.map((res:any,index:number) => {
+            if(index==0)
+            return {...res?.data?.result?.data,active:false}
+            else return {...res?.data?.result?.data,active:false}
+          });
+          console.log("zxcv user:", { usersList });
+          window && window?.androidInteract?.onEvent(JSON.stringify(usersList));
+  
+          setUsers(usersList);
+          console.log("onBotDetailsLoaded running now.");
+          window?.androidInteract?.onBotDetailsLoaded(JSON.stringify(usersList));
+          setCurrentUser(usersList?.[0]);
+        })
+        .catch((err) => {
+          console.log("hjkl:", { err });
+          window && window?.androidInteract?.onEvent(`error in fetching botDetails:${JSON.stringify(err)}`);
+        });
+
+    }catch(err){
+      window && window?.androidInteract?.onEvent(`error in fetching botList:${JSON.stringify(err)}`);
+    }
   }, []);
 
-  const onChangeCurrentUser = (name: string, number: string | null) => {
-    const myUser = users.find((user) => {
-      return user.name === name;
-    }) || { name: "Farmer Bot", number: null };
-    users.forEach((user, index) => {
-      if (user.name === name && user.number === number) {
-        user.active = true;
-      } else if (user.active === true) {
-        user.active = false;
-      }
-    });
-    setCurrentUser(myUser);
-  };
+  // const onChangeCurrentUser = (name: string, number: string | null) => {
+  //   const myUser = users.find((user) => {
+  //     return user.name === name;
+  //   }) || { name: "Farmer Bot", number: null };
+  //   users.forEach((user, index) => {
+  //     if (user.name === name && user.number === number) {
+  //       user.active = true;
+  //     } else if (user.active === true) {
+  //       user.active = false;
+  //     }
+  //   });
+  //   setCurrentUser(myUser);
+  // };
+  const onChangeCurrentUser=useCallback((newUser:{name:string;number:string|null})=>{
+    console.log("qwerty:",{newUser})
+    const currentUser=find(users,{name:newUser.name}) || { name: "Farmer Bot", number: null };
+ 
+     users.forEach((user, index) => {
+        if (user.name === newUser.name && user.name
+          === newUser.name
+          ) {
+          user.active = true;
+        } else if (user.active === true) {
+          user.active = false;
+        }
+      });
+      console.log("qwerty:",{users})
+     // setCurrentUser(currentUser);
+      setCurrentUser({...newUser,active:true});
+    
+  },[users]);
 
   // const onRemoveUser = (name: string, number: string | null) => {
   //   const newUsers = users.filter((user) => {
@@ -166,11 +200,20 @@ const Home: NextPage = () => {
             <title>Farmer Bot</title>
           </Head>
           <CookiesProvider>
-            <App
-              currentUser={currentUser}
-              allUsers={users}
-              toChangeCurrentUser={onChangeCurrentUser}
-            />
+            <AppContext.Provider
+              value={{
+                currentUser,
+                allUsers: users,
+                toChangeCurrentUser: onChangeCurrentUser,
+                
+              }}
+            >
+              <App
+                currentUser={currentUser}
+                allUsers={users}
+                toChangeCurrentUser={onChangeCurrentUser}
+              />
+            </AppContext.Provider>
 
             {/* <ColorModeScript /> */}
           </CookiesProvider>

@@ -8,6 +8,7 @@ import {io} from 'socket.io-client';
 // export const socket = io(`${process.env.NEXT_PUBLIC_TRANSPORT_SOCKET_URL}`,{query: {deviceID:`phone:${localStorage.getItem("phoneNumber")}`}});
 export const send = (msg: any, session: any, accessToken: any, toUser: {name: string, number: string | null}, socket:any, media:any) => {
 console.log("cvbn:",{session,socketID:session.socketID})
+
   if (toUser.number === null || toUser.number === "null") {
     socket.emit("botRequest", {
       content: {
@@ -15,8 +16,8 @@ console.log("cvbn:",{session,socketID:session.socketID})
         userId: session.userID,
         appId: "appId",
         channel: "diksha",
-       from: session.socketID,
-       // from: '9999404725',
+       //from: session.socketID,
+        from: localStorage.getItem('socketID') ?? session.socketID,
         context: null,
         accessToken: accessToken,
         media:media
@@ -30,8 +31,8 @@ console.log("cvbn:",{session,socketID:session.socketID})
         userId: session.userID,
         appId: "appId",
         channel: "diksha",
-       from: session.socketID,
-      // from: '9999404725',
+       //from: session.socketID,
+       from: localStorage.getItem('socketID') ?? session.socketID,
         context: null,
         accessToken: accessToken,
       },
